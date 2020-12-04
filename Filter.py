@@ -674,6 +674,7 @@ elif sesson=="t":
     port=input("chose your port (z11,y22):")
     tabetabdel(sorat/makhrag,port)
 
+#test
 elif sesson=="d": 
     sorat=k*s**4
     makhrag=(s+1)**4
