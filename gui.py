@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-
+from Filter import *
+from sympy import oo
 LARGE_FONT= ("Verdana", 12)
 x,y=648,520
 def raise_frame(frame):
@@ -62,7 +63,7 @@ def StartPage():
             command=lambda: raise_frame(transferFunction))
     btn3.grid(row=1, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
 
-def Synthesis():
+def Synthesisframe():
     label = tk.Label(synthesis,text="Synthesis", font=LARGE_FONT)
     synthesis.rowconfigure([0,1,2], weight=1)
     synthesis.columnconfigure([0,1], weight=1)
@@ -75,39 +76,39 @@ def Synthesis():
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
     label = tk.Label(card_frame,text="enter Z numerator")
-    entry = tk.Entry(card_frame)
-    entry.insert(0,"2*s**2")
+    sorat = tk.Entry(card_frame)
+    sorat.insert(0,"4+5*s+s**2")
     label.grid(row=1,column=2)
-    entry.grid(row=1,column=1)
+    sorat.grid(row=1,column=1)
     label2 = tk.Label(card_frame,text="enter Z denominator")
-    entry2 = tk.Entry(card_frame)
+    makhrag = tk.Entry(card_frame)
     label2.grid(row=2,column=2)
-    entry2.grid(row=2,column=1)
-    entry2.insert(0,"5*s**3+4*(s+2)**2")
-    label3 = tk.Label(card_frame,text="z=(2*s**2)/5*s**3+4*(s+2)**2")
+    makhrag.grid(row=2,column=1)
+    makhrag.insert(0,"2*s+s**2")
+    label3 = tk.Label(card_frame,text="z=4+5s+s^2/2s+s^2")
     label3.grid(row=1,column=0)
     text_box = tk.Text(synthesis)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     text_box.insert("1.0", "Hello")
     text_box.insert("2.0", "\nWorld")
-    cehck=tk.Checkbutton(synthesis, text="real positive",font=LARGE_FONT,variable=realpositive, onvalue=1, offvalue=0, command=print_selection)
-    cehck.grid(row=1,column=1)
+    real=tk.Checkbutton(synthesis, text="real positive",font=LARGE_FONT,variable=realpositive, onvalue=1, offvalue=0)
+    real.grid(row=1,column=1)
     card_frame2 = tk.Frame(synthesis)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2,3], weight=2)
     card_frame2.columnconfigure([0], weight=2)
-    button2 = tk.Button(card_frame2,text="foster1",activeforeground="red",
-                        command=lambda:takevalue(entry))
-    button2.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    button3 = tk.Button(card_frame2,text="foster2",activeforeground="red",
-                        command=lambda:takevalue(entry))
-    button3.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    button4 = tk.Button(card_frame2,text="caer1",activeforeground="red",
-                        command=lambda:takevalue(entry))
-    button4.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    button5 = tk.Button(card_frame2,text="caer2",activeforeground="red",
-                        command=lambda:takevalue(entry))
-    button5.grid(row=3, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    foster1 = tk.Button(card_frame2,text="foster1",activeforeground="red",
+                        command=lambda:Synthesisframesubmit(sorat,makhrag,"f1"))
+    foster1.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    foster2 = tk.Button(card_frame2,text="foster2",activeforeground="red",
+                        command=lambda:Synthesisframesubmit(sorat,makhrag,"f2"))
+    foster2.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    caer1 = tk.Button(card_frame2,text="caer1",activeforeground="red",
+                        command=lambda:Synthesisframesubmit(sorat,makhrag,"c1"))
+    caer1.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    caer2 = tk.Button(card_frame2,text="caer2",activeforeground="red",
+                        command=lambda:Synthesisframesubmit(sorat,makhrag,"c2"))
+    caer2.grid(row=3, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
 
     #scrool
     #t = ttk.Treeview(self)
@@ -117,7 +118,7 @@ def Synthesis():
     #scroll.configure(command=t.yview)
     #t.configure(yscrollcommand=scroll.set)
 
-def Darlington():
+def Darlingtonframe():
     label = tk.Label(darlington,text="Darlington", font=LARGE_FONT)
     darlington.rowconfigure([0,1,2], weight=1)
     darlington.columnconfigure([0,1], weight=1)
@@ -132,15 +133,15 @@ def Darlington():
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
     label = tk.Label(card_frame,text="enter Z numerator")
-    entry = tk.Entry(card_frame,exportselection=0)
-    entry.insert(0,"2*s**2")
+    sorat = tk.Entry(card_frame,exportselection=0)
+    sorat.insert(0,"2*s**2")
     label.grid(row=1,column=2)
-    entry.grid(row=1,column=1)
+    sorat.grid(row=1,column=1)
     label2 = tk.Label(card_frame,text="enter Z denominator")
-    entry2 = tk.Entry(card_frame,exportselection=0)
-    entry2.insert(0,"5*s**3+4*(s+2)**2")
+    makhrag = tk.Entry(card_frame,exportselection=0)
+    makhrag.insert(0,"5*s**3+4*(s+2)**2")
     label2.grid(row=2,column=2)
-    entry2.grid(row=2,column=1)
+    makhrag.grid(row=2,column=1)
     label3 = tk.Label(card_frame,text="z=(2*s**2)/5*s**3+4*(s+2)**2")
     label3.grid(row=1,column=0)
     text_box = tk.Text(darlington)
@@ -152,13 +153,13 @@ def Darlington():
     card_frame2.rowconfigure([0,1,2], weight=1)
     card_frame2.columnconfigure([0], weight=1)
     tk.Radiobutton(card_frame2, text = "Z11", variable = port,width=15,  
-            value = "z11", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=0, column=0, sticky='we')
+            value = "z11", indicator = 0,command=lambda: Darlingtonframesubmit(card_frame2,sorat,makhrag),
+            ).grid(row=0, column=0,sticky='nesw')
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
-            value = "y22", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=1, column=0, sticky='we')        
+            value = "y22", indicator = 0,command=lambda: Darlingtonframesubmit(card_frame2,sorat,makhrag),
+            ).grid(row=1, column=0,sticky='nesw')        
 
-def PageThree():
+def PageThreeframe():
     label = tk.Label(pageThree,text="P(S)*P(-S)", font=LARGE_FONT)
     pageThree.rowconfigure([0,1,2], weight=1)
     pageThree.columnconfigure([0,1], weight=1)
@@ -173,15 +174,15 @@ def PageThree():
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
     label = tk.Label(card_frame,text="enter Z numerator")
-    entry = tk.Entry(card_frame,exportselection=0)
-    entry.insert(0,"2*s**2")
+    sorat = tk.Entry(card_frame,exportselection=0)
+    sorat.insert(0,"2*s**2")
     label.grid(row=1,column=2)
-    entry.grid(row=1,column=1)
+    sorat.grid(row=1,column=1)
     label2 = tk.Label(card_frame,text="enter Z denominator")
-    entry2 = tk.Entry(card_frame,exportselection=0)
-    entry2.insert(0,"5*s**3+4*(s+2)**2")
+    makhrag = tk.Entry(card_frame,exportselection=0)
+    makhrag.insert(0,"5*s**3+4*(s+2)**2")
     label2.grid(row=2,column=2)
-    entry2.grid(row=2,column=1)
+    makhrag.grid(row=2,column=1)
     label3 = tk.Label(card_frame,text="z=(2*s**2)/5*s**3+4*(s+2)**2")
     label3.grid(row=1,column=0)
     text_box = tk.Text(pageThree)
@@ -191,16 +192,18 @@ def PageThree():
     card_frame2 = tk.Frame(pageThree)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
-    card_frame2.columnconfigure([0], weight=1)
-    tk.Radiobutton(card_frame2, text = "Z11", variable = port,width=15,  
-            value = "z11", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=0, column=0, sticky='we')
-    tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
-            value = "y22", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=1, column=0, sticky='we')  
-
+    card_frame2.columnconfigure([0,1], weight=1)
+    tk.Label(card_frame2,text="RS =").grid(row=0, column=0,sticky='nesw')
+    rs=tk.Entry(card_frame2,exportselection=0)
+    rs.grid(row=0, column=1,sticky='ew')
+    tk.Label(card_frame2,text="RL =").grid(row=1, column=0,sticky='nesw')
+    rl=tk.Entry(card_frame2,exportselection=0)
+    rl.grid(row=1, column=1, sticky='ew')  
+    button1 = tk.Button(card_frame2,text="submit",width=15,
+                        command=lambda: PageThreeframesubmit(sorat,makhrag,rl,rs) )
+    button1.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
       
-def TransferFunction():
+def TransferFunctionframe():
     label = tk.Label(transferFunction,text="Transfer Function", font=LARGE_FONT)
     transferFunction.rowconfigure([0,1,2], weight=1)
     transferFunction.columnconfigure([0,1], weight=1)
@@ -215,15 +218,15 @@ def TransferFunction():
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
     label = tk.Label(card_frame,text="enter Z numerator")
-    entry = tk.Entry(card_frame,exportselection=0)
-    entry.insert(0,"2*s**2")
+    sorat = tk.Entry(card_frame,exportselection=0)
+    sorat.insert(0,"2*s**2")
     label.grid(row=1,column=2)
-    entry.grid(row=1,column=1)
+    sorat.grid(row=1,column=1)
     label2 = tk.Label(card_frame,text="enter Z denominator")
-    entry2 = tk.Entry(card_frame,exportselection=0)
-    entry2.insert(0,"5*s**3+4*(s+2)**2")
+    makhrag = tk.Entry(card_frame,exportselection=0)
+    makhrag.insert(0,"5*s**3+4*(s+2)**2")
     label2.grid(row=2,column=2)
-    entry2.grid(row=2,column=1)
+    makhrag.grid(row=2,column=1)
     label3 = tk.Label(card_frame,text="z=(2*s**2)/5*s**3+4*(s+2)**2")
     label3.grid(row=1,column=0)
     text_box = tk.Text(transferFunction)
@@ -235,55 +238,66 @@ def TransferFunction():
     card_frame2.rowconfigure([0,1,2], weight=1)
     card_frame2.columnconfigure([0], weight=1)
     tk.Radiobutton(card_frame2, text = "Z11", variable = port,width=15,  
-            value = "z11", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=0, column=0, sticky='we')
+            value = "z11", indicator = 0,command=lambda: TransferFunctionframesubmit(sorat,makhrag,port="z11"),
+            ).grid(row=0, column=0,sticky='nesw')
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
-            value = "y22", indicator = 0,command=lambda: select(card_frame2),
-            ).grid(row=1, column=0, sticky='we')  
+            value = "y22", indicator = 0,command=lambda: TransferFunctionframesubmit(sorat,makhrag,port="y22"),
+            ).grid(row=1, column=0,sticky='nesw')
+
+
+ 
 def click(event):  
     x = event.x_root - synthesis.winfo_rootx() 
     y = event.y_root - synthesis.winfo_rooty() 
     z = synthesis.grid_location(x, y) 
     # printing position 
     print(z) 
-def select(frame):
-    global entry
+def Darlingtonframesubmit(frame,sorat,makhrag):
     card_frame = tk.Frame(frame)
     card_frame.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1,2], weight=1)
     card_frame.columnconfigure([0], weight=1)
-    #label.config(text = selection)
     if port.get()=="z11":
         label = tk.Label(card_frame,text="RS= :", font=LARGE_FONT)
         label.grid(row=0,column=0)
-        entry = tk.Entry(card_frame,exportselection=0)
-        entry.grid(row=1,column=0)
+        rs = tk.Entry(card_frame,exportselection=0)
+        rs.grid(row=1,column=0)
+        button1 = tk.Button(card_frame,text="submit",width=15,
+                    command=lambda: DarlingtonFramesubmit(sorat.get(),makhrag.get(),port.get(),RS=rs.get()))
+        button1.grid(row=2,column=0)  
     elif port.get()=="y22":
         label = tk.Label(card_frame,text="RL= :", font=LARGE_FONT)
         label.grid(row=0,column=0)
-        entry = tk.Entry(card_frame)
-        entry.grid(row=1,column=0) 
-    button1 = tk.Button(card_frame,text="submit",width=15,
-                    command=R)
-    button1.grid(row=2,column=0) 
-       
-    print("You selected the option " + str(port.get()))   
-def R():
-    print("resistant is :",entry.get())
+        rl = tk.Entry(card_frame)
+        rl.grid(row=1,column=0) 
+        button1 = tk.Button(card_frame,text="submit",width=15,
+                        command=lambda: DarlingtonFramesubmit(sorat.get(),makhrag.get(),port.get(),RL=rl.get()))
+        button1.grid(row=2,column=0)       
 
-def print_selection():
+def DarlingtonFramesubmit(sorat,makhrag,port,RS=0,RL=oo):
+    print(sorat,makhrag,port,RS,RL)
+    Darlington(sorat,makhrag,port,RS=RS,RL=RL)
+def TransferFunctionframesubmit(sorat,makhrag,port):
+    print(sorat.get(),makhrag.get(),port)
+    TransferFunction(sorat.get(),makhrag.get(),port)
+def Synthesisframesubmit(sorat,makhrag,op,real=False):
     if realpositive.get() == 1:
-        print(1)   
+        real=True
+    print(sorat.get(),makhrag.get(),op,real)    
+    Synthesis(sorat.get(),makhrag.get(),op,real)
+def PageThreeframesubmit(sorat,makhrag,rl,rs):
+    print(sorat.get(),makhrag.get(),rl.get(),rs.get())
+    PageThree(sorat.get(),makhrag.get(),RS=rs.get(),RL=rl.get())
 def toturial():
     from tkinter import messagebox
     messagebox.showinfo( "Tutorial", "In the home page you most choose one operation by clicking on it and after that another window pops up which you most to "+ 
                             "enter your evaluation numerator and demoninator sepraetly,Attention!! difined symbols are just (s,k) dont try anything else because you got Error if you want to add square of any number just type 'sqrt(number)' and"+  
                             " for adding any power just type'number**power',There is no diffrence between number and symbols in this situation.")    
 StartPage()
-Synthesis()
-Darlington()
-PageThree()
-TransferFunction()
+Synthesisframe()
+Darlingtonframe()
+PageThreeframe()
+TransferFunctionframe()
 root.update_idletasks()  # Update "requested size" from geometry manager
 a,a0=str(x),x/2
 b,b0=str(y),y/2

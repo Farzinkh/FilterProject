@@ -556,11 +556,10 @@ def Hervits(z):  #study for being hervit
     if H==1 :
         print("Hervits True") 
         return H
-sesson=input("santez or p(s)p(-s) or tabetabdel or darlington ==> (s,p,t,d) :")
-if sesson=="p":
-    makhrag=(s**2+3*s+3)*(s**2-3*s+3)
+def PageThree(sorat,makhrag,RS=0,RL=oo):
+    #makhrag=(s**2+3*s+3)*(s**2-3*s+3)
     m=makhrag
-    sorat=0.8888*s**4
+    #sorat=0.8888*s**4
     makhrag=simplify(makhrag)
     ps=1-(S(sorat)/S(makhrag))
     ps=cancel(ps)
@@ -613,50 +612,49 @@ if sesson=="p":
     zin2=(1-ps2)/(1+ps2)
     zin1,zin2=factor(zin1,s),factor(zin2,s)
     print('zin1 =',zin1,'\n','zin2 =',zin2)
-    #santez
-    which=input("which zin 1 or 2 =")
-    while 1:
-        if 1==int(which):
-            ans=apart(zin1).evalf()
-            print("Zin",ans)
-            ans=ans-ans.args[0]
-            n=fraction(ans)[0]
-            expr1=fraction(ans)[1]/n
-            expr2=fraction(ans)[0]/n
-            ans=expr1/expr2
-            print("Yin",ans)
-            break
-        elif 2==int(which):
-            ans=apart(zin2).evalf()
-            print("Zin",ans)
-            ans=ans-ans.args[0]
-            n=fraction(ans)[0]
-            expr1=fraction(ans)[1]/n
-            expr2=fraction(ans)[0]/n
-            ans=expr1/expr2
-            print("Yin",ans)
-            break
-        else:
-            print("wrong choice")
-            which=input("which zin 1 or 2 =") 
-    which=input("which syntesis c1 or c2 =")        
-    if which=="c1":
-        caer1(ans)
-    elif which=="c2":
-        caer2(ans)
-elif sesson=="s":
-    sorat=4+5*s+s**2
-    makhrag=2*s+s**2
+    #choose zin
+    l1=limit_seq(zin1,s).doit()
+    l2=limit_seq(zin2,s).doit()
+    if im(l1)==0 or RL==1:
+        which="z11"
+    elif im(l2)==0:
+        which="y22"
+    print(l1,l2,which)
+    if which=="z11":
+        ans=apart(zin1).evalf()
+        print("Zin",ans)
+        ans=ans-ans.args[0]
+        n=fraction(ans)[0]
+        expr1=fraction(ans)[1]/n
+        expr2=fraction(ans)[0]/n
+        ans=expr1/expr2
+        print("Yin",ans)
+    elif which=="y22":
+        ans=apart(zin2).evalf()
+        print("Zin",ans)
+        ans=ans-ans.args[0]
+        n=fraction(ans)[0]
+        expr1=fraction(ans)[1]/n
+        expr2=fraction(ans)[0]/n
+        ans=expr1/expr2
+        print("Yin",ans)
+    S,M=degree(fraction(ans)[0],gen=s),degree(fraction(ans)[1])
+    CORE(S,M,ans)
+
+def Synthesis(sorat,makhrag,op,real=False):
+    #sorat=4+5*s+s**2
+    #makhrag=2*s+s**2
+    sorat,makhrag=simplify(sorat),simplify(makhrag)
     expr2=expand(fraction(sorat/makhrag)[1]) 
     expr1=expand(fraction(sorat/makhrag)[0])     
     rl1=expr1.as_ordered_terms('rev-lex')
     rl2=expr2.as_ordered_terms('rev-lex')  
     t=reversetaghsim(rl1,rl2)  
     print("test taghsim",t) 
-    #if not pr(sorat/makhrag):
-    #    print("synthesis is not enforceable")
-        #sys.exit()
-    op=input("chose operation f1,f2,c1,c2:")
+    if real:
+        if not pr(sorat/makhrag):
+            print("synthesis is not enforceable")
+            sys.exit()
     if op=="f1":
         faster1(sorat/makhrag)
     elif op=="f2":
@@ -665,19 +663,18 @@ elif sesson=="s":
         caer1(sorat/makhrag)
     elif op=="c2":
         caer2(sorat/makhrag)
-elif sesson=="t":
-    sorat=k*s**4
-    makhrag=s**2+3*s+3
-    #if not pr(sorat/makhrag):
-    #    print("synthesis is not enforceable")
-    #    sys.exit()
-    port=input("chose your port (z11,y22):")
+def TransferFunction(sorat,makhrag,port):
+    #sorat=k*s**4
+    #makhrag=s**2+3*s+3
+    if not pr(sorat/makhrag):
+        print("synthesis is not enforceable")
+        sys.exit()
+    #port=input("chose your port (z11,y22):")
     tabetabdel(sorat/makhrag,port)
 
-#test
-elif sesson=="d": 
-    sorat=k*s**4
-    makhrag=(s+1)**4
+def Darlington(sorat,makhrag,port,RS=0,RL=oo):
+    #sorat=k*s**4
+    #makhrag=(s+1)**4
     f=simplify(sorat/makhrag)
     S,M=degree(fraction(f)[0],gen=s),degree(fraction(f)[1])
     for i in degree_list(fraction(f)[0],s):
@@ -715,21 +712,17 @@ elif sesson=="d":
         ans=f0/f1  
     print("darlington =>",f,"numerator is",kind)    
     print("even part:",evenpart,"odd part:",oddpart,"\n","H(s)=",ans) 
-    port=input("chose your port (z11,y22):") 
     if port=="y22": #consider negative multiplayer
-        rl=int(input("Rl= :"))
-        rl=1/rl
+        rl=1/RL
         #final=fraction(ans)[1]-rl
         final=f1-rl  #test
         print("\n",port,":",final,"\n")
         CORE(S,M,1/final,port=port,RL=rl)
         
     if port=="z11":
-        rs=int(input("RS= :"))
         #final=fraction(ans)[1]-rs
-        final=f1-rs
+        final=f1-RS
         print("\n",port,":",final,"\n")
         print("test",simplify(final))
-        CORE(S,M,final,port=port,RS=rs)          
-else:
-    raise Exception("unsupported operation")    
+        CORE(S,M,final,port=port,RS=RS)          
+   
