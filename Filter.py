@@ -557,11 +557,13 @@ def Hervits(z):  #study for being hervit
         print("Hervits True") 
         return H
 def PageThree(sorat,makhrag,RS=0,RL=oo):
+    sorat,makhrag=simplify(sorat),simplify(makhrag)
     #makhrag=(s**2+3*s+3)*(s**2-3*s+3)
     m=makhrag
     #sorat=0.8888*s**4
     makhrag=simplify(makhrag)
-    ps=1-(S(sorat)/S(makhrag))
+    #ps=1-(S(sorat)/S(makhrag))
+    ps=1-(sorat/makhrag)
     ps=cancel(ps)
     #n=fraction(ps)[1].coeff(s,4)
     n=LC(fraction(ps)[1])
@@ -664,15 +666,17 @@ def Synthesis(sorat,makhrag,op,real=False):
     elif op=="c2":
         caer2(sorat/makhrag)
 def TransferFunction(sorat,makhrag,port):
+    sorat,makhrag=simplify(sorat),simplify(makhrag)
     #sorat=k*s**4
     #makhrag=s**2+3*s+3
-    if not pr(sorat/makhrag):
-        print("synthesis is not enforceable")
-        sys.exit()
+    #if not pr(sorat/makhrag):
+    #    print("synthesis is not enforceable")
+    #    sys.exit()
     #port=input("chose your port (z11,y22):")
     tabetabdel(sorat/makhrag,port)
 
 def Darlington(sorat,makhrag,port,RS=0,RL=oo):
+    sorat,makhrag=simplify(sorat),simplify(makhrag)
     #sorat=k*s**4
     #makhrag=(s+1)**4
     f=simplify(sorat/makhrag)
@@ -721,6 +725,7 @@ def Darlington(sorat,makhrag,port,RS=0,RL=oo):
         
     if port=="z11":
         #final=fraction(ans)[1]-rs
+        print(type(f1),type(RS))
         final=f1-RS
         print("\n",port,":",final,"\n")
         print("test",simplify(final))
