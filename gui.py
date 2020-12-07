@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import ttk
-from Filter import *
+import tkinter.ttk as ttk
+from Filter import TransferFunction,Darlington,Synthesis,PageThree
 from sympy import oo
 LARGE_FONT= ("Verdana", 12)
 x,y=648,520
@@ -89,8 +89,8 @@ def Synthesisframe():
     label3.grid(row=1,column=0)
     text_box = tk.Text(synthesis)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    text_box.insert("1.0", "Hello")
-    text_box.insert("2.0", "\nWorld")
+    #text_box.insert("1.0", "Hello")
+    #text_box.insert("2.0", "\nWorld")
     real=tk.Checkbutton(synthesis, text="real positive",font=LARGE_FONT,variable=realpositive, onvalue=1, offvalue=0)
     real.grid(row=1,column=1)
     card_frame2 = tk.Frame(synthesis)
@@ -98,16 +98,16 @@ def Synthesisframe():
     card_frame2.rowconfigure([0,1,2,3], weight=2)
     card_frame2.columnconfigure([0], weight=2)
     foster1 = tk.Button(card_frame2,text="foster1",activeforeground="red",
-                        command=lambda:Synthesisframesubmit(sorat,makhrag,"f1"))
+                        command=lambda:Synthesisframesubmit(text_box,sorat,makhrag,"f1"))
     foster1.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     foster2 = tk.Button(card_frame2,text="foster2",activeforeground="red",
-                        command=lambda:Synthesisframesubmit(sorat,makhrag,"f2"))
+                        command=lambda:Synthesisframesubmit(text_box,sorat,makhrag,"f2"))
     foster2.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     caer1 = tk.Button(card_frame2,text="caer1",activeforeground="red",
-                        command=lambda:Synthesisframesubmit(sorat,makhrag,"c1"))
+                        command=lambda:Synthesisframesubmit(text_box,sorat,makhrag,"c1"))
     caer1.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     caer2 = tk.Button(card_frame2,text="caer2",activeforeground="red",
-                        command=lambda:Synthesisframesubmit(sorat,makhrag,"c2"))
+                        command=lambda:Synthesisframesubmit(text_box,sorat,makhrag,"c2"))
     caer2.grid(row=3, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
 
     #scrool
@@ -142,21 +142,19 @@ def Darlingtonframe():
     makhrag.insert(0,"(s+1)**4")
     label2.grid(row=2,column=2)
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="z=(ks^4)/((s+1)^4)")
+    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/((s+1)^4)")
     label3.grid(row=1,column=0)
     text_box = tk.Text(darlington)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    text_box.insert("1.0", "Hello")
-    text_box.insert("2.0", "\nWorld")
     card_frame2 = tk.Frame(darlington)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
     card_frame2.columnconfigure([0], weight=1)
     tk.Radiobutton(card_frame2, text = "Z11", variable = port,width=15,  
-            value = "z11", indicator = 0,command=lambda: Darlingtonframesubmit(card_frame2,sorat,makhrag),
+            value = "z11", indicator = 0,command=lambda: Darlingtonframesubmit(text_box,card_frame2,sorat,makhrag),
             ).grid(row=0, column=0,sticky='nesw')
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
-            value = "y22", indicator = 0,command=lambda: Darlingtonframesubmit(card_frame2,sorat,makhrag),
+            value = "y22", indicator = 0,command=lambda: Darlingtonframesubmit(text_box,card_frame2,sorat,makhrag),
             ).grid(row=1, column=0,sticky='nesw')        
 
 def PageThreeframe():
@@ -183,12 +181,10 @@ def PageThreeframe():
     makhrag.insert(0,"5*s**3+4*(s+2)**2")
     label2.grid(row=2,column=2)
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="z=(2*s**2)/5*s**3+4*(s+2)**2")
+    label3 = tk.Label(card_frame,text="H(s)=(2*s**2)/5*s**3+4*(s+2)**2")
     label3.grid(row=1,column=0)
     text_box = tk.Text(pageThree)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    text_box.insert("1.0", "Hello")
-    text_box.insert("2.0", "\nWorld")
     card_frame2 = tk.Frame(pageThree)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
@@ -200,7 +196,7 @@ def PageThreeframe():
     rl=tk.Entry(card_frame2,exportselection=0)
     rl.grid(row=1, column=1, sticky='ew')  
     button1 = tk.Button(card_frame2,text="submit",width=15,
-                        command=lambda: PageThreeframesubmit(sorat,makhrag,rl,rs) )
+                        command=lambda: PageThreeframesubmit(text_box,sorat,makhrag,rl,rs) )
     button1.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
       
 def TransferFunctionframe():
@@ -227,21 +223,19 @@ def TransferFunctionframe():
     makhrag.insert(0,"s**2+3*s+3")
     label2.grid(row=2,column=2)
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="z=(ks^4)/(s^2+3s+3)")
+    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/(s^2+3s+3)")
     label3.grid(row=1,column=0)
     text_box = tk.Text(transferFunction)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    text_box.insert("1.0", "Hello")
-    text_box.insert("2.0", "\nWorld")
     card_frame2 = tk.Frame(transferFunction)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
     card_frame2.columnconfigure([0], weight=1)
     tk.Radiobutton(card_frame2, text = "Z11", variable = port,width=15,  
-            value = "z11", indicator = 0,command=lambda: TransferFunctionframesubmit(sorat,makhrag,port="z11"),
+            value = "z11", indicator = 0,command=lambda: TransferFunctionframesubmit(text_box,sorat,makhrag,port="z11"),
             ).grid(row=0, column=0,sticky='nesw')
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
-            value = "y22", indicator = 0,command=lambda: TransferFunctionframesubmit(sorat,makhrag,port="y22"),
+            value = "y22", indicator = 0,command=lambda: TransferFunctionframesubmit(text_box,sorat,makhrag,port="y22"),
             ).grid(row=1, column=0,sticky='nesw')
 
 
@@ -252,7 +246,7 @@ def click(event):
     z = synthesis.grid_location(x, y) 
     # printing position 
     print(z) 
-def Darlingtonframesubmit(frame,sorat,makhrag):
+def Darlingtonframesubmit(text_box,frame,sorat,makhrag):
     card_frame = tk.Frame(frame)
     card_frame.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1,2], weight=1)
@@ -263,7 +257,7 @@ def Darlingtonframesubmit(frame,sorat,makhrag):
         rs = tk.Entry(card_frame,exportselection=0)
         rs.grid(row=1,column=0)
         button1 = tk.Button(card_frame,text="submit",width=15,
-                    command=lambda: DarlingtonFramesubmit(sorat.get(),makhrag.get(),port.get(),RS=rs.get()))
+                    command=lambda: DarlingtonFramesubmit(text_box,sorat.get(),makhrag.get(),port.get(),RS=rs.get()))
         button1.grid(row=2,column=0)  
     elif port.get()=="y22":
         label = tk.Label(card_frame,text="RL= :", font=LARGE_FONT)
@@ -271,26 +265,26 @@ def Darlingtonframesubmit(frame,sorat,makhrag):
         rl = tk.Entry(card_frame)
         rl.grid(row=1,column=0) 
         button1 = tk.Button(card_frame,text="submit",width=15,
-                        command=lambda: DarlingtonFramesubmit(sorat.get(),makhrag.get(),port.get(),RL=rl.get()))
+                        command=lambda: DarlingtonFramesubmit(text_box,sorat.get(),makhrag.get(),port.get(),RL=rl.get()))
         button1.grid(row=2,column=0)       
 
-def DarlingtonFramesubmit(sorat,makhrag,port,RS=0,RL=oo):
+def DarlingtonFramesubmit(text_box,sorat,makhrag,port,RS=0,RL=oo):
     print(sorat,makhrag,port,RS,RL)
     if RL==oo:
-        Darlington(sorat,makhrag,port,RS=int(RS),RL=RL)
+        Darlington(text_box,sorat,makhrag,port,RS=int(RS),RL=RL)
     else:    
-        Darlington(sorat,makhrag,port,RS=int(RS),RL=int(RL))
-def TransferFunctionframesubmit(sorat,makhrag,port):
+        Darlington(text_box,sorat,makhrag,port,RS=int(RS),RL=int(RL))
+def TransferFunctionframesubmit(text_box,sorat,makhrag,port):
     print(sorat.get(),makhrag.get(),port)
-    TransferFunction(sorat.get(),makhrag.get(),port)
-def Synthesisframesubmit(sorat,makhrag,op,real=False):
+    TransferFunction(text_box,sorat.get(),makhrag.get(),port)
+def Synthesisframesubmit(text_box,sorat,makhrag,op,real=False):
     if realpositive.get() == 1:
         real=True
     print(sorat.get(),makhrag.get(),op,real)    
-    Synthesis(sorat.get(),makhrag.get(),op,real)
-def PageThreeframesubmit(sorat,makhrag,rl,rs):
+    Synthesis(text_box,sorat.get(),makhrag.get(),op,real)
+def PageThreeframesubmit(text_box,sorat,makhrag,rl,rs):
     print(sorat.get(),makhrag.get(),rl.get(),rs.get())
-    PageThree(sorat.get(),makhrag.get(),RS=rs.get(),RL=rl.get())
+    PageThree(text_box,sorat.get(),makhrag.get(),RS=rs.get(),RL=rl.get())
 def toturial():
     from tkinter import messagebox
     messagebox.showinfo( "Tutorial", "In the home page you most choose one operation by clicking on it and after that another window pops up which you most to "+ 
@@ -319,4 +313,6 @@ root.bind('<Escape>', lambda e: root.destroy())
 root.protocol("WM_DELETE_WINDOW", root.iconify)
 raise_frame(startpage)
 print("root grids",root.grid_size() )
+#print(ttk.Style().theme_names())
+ttk.Style().theme_use('xpnative')
 root.mainloop()

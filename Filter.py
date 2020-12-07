@@ -6,6 +6,7 @@ import threading
 import schemdraw
 import schemdraw.elements as elm
 import matplotlib.pyplot as plt
+from tkinter import END
 plt.xkcd()
 init_printing(use_unicode=False, wrap_line=True)
 s,x,y,p,k=symbols('s x y p k')
@@ -41,25 +42,32 @@ def faster1(z):
         if im(i) !=0:
             gener="LC"
             break
-        gener="RC"     
+        gener="RC" 
     print("faster1 ",gener,"generation")
+    Append("faster1 "+gener+" generation")     
     print("zeros :",zeros,"pols",pols)
+    Append("zeros :"+' '.join(map(str, zeros)) +" pols :"+' '.join(map(str, pols))) 
     print("limit on pols")
+    Append("limit on pols")
     if gener=="LC":
         z=z*(1/s)
         z.subs(s**2,s)
         z=apart(z).evalf()
         z.subs(s,s**2)
         print("z/s=",z)
+        Append("z/s= "+tolatex(z))
         z=apart(z*s)
     else:
         z=apart(z)    
     print("A,B,... =>","Z=",z)
+    Append("A,B,... => "+"Z="+str(z))
     print("Z=")
+    Append("Z=")
     for i in z.args:
         i=simplify((fraction(i)[1]/fraction(i)[0]))
         r=1/i
         print(r," + ") 
+        Append(str(r)+" + ")
         if fraction(r)[0] !=1:
             data=intelligent({"type":"y","data":i})
             data["dirrection"]="right"
@@ -73,6 +81,8 @@ def faster1(z):
                 if data["type"]=="r":
                     data["label"]=1/data["label"]
                 buffers.append(data)
+    Append("# synthesis operation successfully completed ")            
+    Append("",finish=True)            
     draw(buffers)
 
 
@@ -90,16 +100,21 @@ def faster2(z):
             break
         gener="RC"    
     print("faster2",gener,"generation")
+    Append("faster2 "+gener+" generation")   
     print("zeros :",zeros,"pols",pols)
+    Append("zeros :"+' '.join(map(str, zeros)) +" pols :"+' '.join(map(str, pols))) 
     print("limit on pols")
+    Append("limit on pols")
     if gener=="LC":
         z=z*(1/s)
         z.subs(s**2,s)
         z=apart(z)
         z.subs(s,s**2)
         print("Y/s=",z)
+        Append("Y/s= "+str(z))
         z=apart(z*s)
         print("A,B,... =>","Y=",z)
+        Append("A,B,... => "+"Y="+str(z))
         for i in z.args:
             if fraction(i)[1] !=1 and fraction(i)[1] !=1:
                 e=list_to_frac([0,i])
@@ -110,7 +125,8 @@ def faster2(z):
     else: 
         z=z*(1/s)
         z=apart(z)
-        print("A,B,... =>","Y/s=",z) 
+        print("A,B,... =>","Y/s=",z)
+        Append("A,B,... => "+"Y/s="+str(z))
         for i in z.args:
             e=i*s
             if fraction(e)[1] !=1 and fraction(e)[1] !=1:
@@ -119,9 +135,11 @@ def faster2(z):
                 d.append(1/e)
             else:    
                 d.append(expand(e))
-    print("Y=")  
+    print("Y=")
+    Append("Y=")  
     for i in d:
         print(i," + ") 
+        Append(str(i)+" + ")
         if fraction(i)[0] !=1:
             data=intelligent({"type":"Y","data":i})
             data["dirrection"]="down"
@@ -133,6 +151,8 @@ def faster2(z):
                 data=intelligent({"type":"z","data":j})
                 data["parallel"],data["dirrection"]=True,"down"
                 buffers.append(data)
+    Append("# synthesis operation successfully completed ")             
+    Append("",finish=True)            
     draw(buffers)
 
 def list_to_frac(l):
@@ -162,6 +182,7 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
                 break
             gener="RC"   
         print("zeros :",zeros,"pols",pols)   
+        Append("zeros :"+' '.join(map(str, zeros)) +" pols :"+' '.join(map(str, pols))) 
     tafavot=degree(fraction(z)[0])-degree(fraction(z)[1])
     if tafavot>=0:
         santez,con,firstdirrection="Z",0,"right"
@@ -174,6 +195,7 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
     expr1=expand(fraction(z)[0]) 
     z=expr1/expr2
     print("caer1 santez",gener,"generation",types[con],"=",z)
+    Append("caer1 santez "+str(gener)+" generation "+types[con]+"="+str(z))
     while 1:     
         if santez=="Y":
             con=1
@@ -188,6 +210,7 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
         ans=t[0]
         anslist.append(ans)
         print(types[con],"=",ans,"+",v.evalf()," => ",ans)
+        Append(types[con]+"="+str(ans)+" + "+str(v.evalf())+" => "+str(ans))
         data=intelligent({"type":types[con],"data":ans})
         data["dirrection"]=firstdirrection
         buffers.append(data)
@@ -197,20 +220,24 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
             if cont==0:
                 if v==0:    
                     print("# synthesis operation successfully completed caer2 to caer1")
+                    Append("# synthesis operation successfully completed caer2 to caer1")
                 elif Derivative(v,s).doit()==0:
-                    print(types[con],"=",v.evalf()," => ",v.evalf()) 
+                    print(types[con],"=",v.evalf()," => ",v.evalf())
+                    Append(types[con]+"="+str(v.evalf())+" => "+str(v.evalf())) 
                     data=intelligent({"type":types[con],"data":v})
                     con=con-1
                     firstdirrection=dirrections[con]
                     data["dirrection"]=firstdirrection
                     buffers.append(data)
-                    print("# synthesis operation successfully completed caer2 to caer1")      
+                    print("# synthesis operation successfully completed caer2 to caer1")
+                    Append("# synthesis operation successfully completed caer2 to caer1")      
                 if santez=="Y":
                     v=1/v 
                 return [buffers,gener,v.evalf()]
         if Derivative(v,s).doit()==0 and v!=0:
             anslist.append(v)
             print(types[con],"=",v," => ",v)
+            Append(types[con]+"="+str(v)+" => "+str(v))
             data=intelligent({"type":types[con],"data":v})
             con=con-1
             firstdirrection=dirrections[con]
@@ -224,9 +251,13 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
         santez=types[con]
         firstdirrection=dirrections[con]
         print(santez,"=",z)
+        Append(str(santez)+" = "+str(z))
 
-    print("# synthesis operation successfully completed ")   
+    print("# synthesis operation successfully completed ")
+    Append("# synthesis operation successfully completed ")    
     print(firstsantez,"=",list_to_frac(anslist)) 
+    Append(str(firstsantez)+" = "+str(list_to_frac(anslist)))
+    Append("",finish=True)
     draw(buffers,port=port,rs=RS,rl=RL)
 def reversetaghsim(S,M):
     a,b="",""
@@ -260,6 +291,7 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
                 break
             gener="RC"   
         print("zeros :",zeros,"pols",pols) 
+        Append("zeros :"+' '.join(map(str, zeros)) +" pols :"+' '.join(map(str, pols))) 
     moghayese="Z"    
     for i in pols:
         if i==0:
@@ -280,6 +312,7 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
     z=simplify(z)    
 
     print("caer2 santez",gener,"generation",firstsantez,"=",z)
+    Append("caer2 santez "+gener+" generation "+firstsantez+" = "+str(z))
     while 1:     
         if santez=="Y":
             con=1
@@ -293,6 +326,7 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
         z=t[1]/expr2
         anslist.append(t[0])
         print(types[con],"=",t[0],"+",z.evalf()," => ",t[0])
+        Append(types[con]+" = "+str(t[0])+" + "+str(z.evalf())+" => "+str(t[0]))
         data=intelligent({"type":types[con],"data":t[0]})
         data["dirrection"]=firstdirrection
         buffers.append(data)
@@ -302,20 +336,24 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
             if cont==0:
                 if z==0:    
                     print("# synthesis operation successfully completed caer1 to caer2")
+                    Append("# synthesis operation successfully completed caer1 to caer2")
                 elif Derivative(z,s).doit()==0:
-                    print(types[con],"=",z.evalf()," => ",z.evalf()) 
+                    print(types[con],"=",z.evalf()," => ",z.evalf())
+                    Append(types[con]+"="+str(z.evalf())+" => "+str(z.evalf()))  
                     data=intelligent({"type":types[con],"data":z})
                     con=con-1
                     firstdirrection=dirrections[con]
                     data["dirrection"]=firstdirrection
                     buffers.append(data) 
-                    print("# synthesis operation successfully completed caer1 to caer2")   
+                    print("# synthesis operation successfully completed caer1 to caer2")
+                    Append("# synthesis operation successfully completed caer1 to caer2")   
                 if santez=="Y":
                     z=1/z    
                 return [buffers,gener,z]
         if Derivative(z,s).doit()==0 and z!=0:
             anslist.append(z)
             print(types[con],"=",z," => ",z)
+            Append(types[con]+"="+str(z)+" => "+str(z))
             data=intelligent({"type":types[con],"data":z})
             con=con-1
             firstdirrection=dirrections[con]
@@ -329,9 +367,13 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
         santez=types[con]
         firstdirrection=dirrections[con]
         print(santez,"=",z)
+        Append(str(santez)+"="+str(z))
 
-    print("# synthesis operation successfully completed ")   
+    print("# synthesis operation successfully completed ")
+    Append("# synthesis operation successfully completed ")    
     print(firstsantez,"=",list_to_frac(anslist)) 
+    Append(firstsantez+" = "+str(list_to_frac(anslist))) 
+    Append("",finish=True)
     draw(buffers,port=port,rs=RS,rl=RL)
 
 def CORE(S,M,f,port="z11",RS=0,RL=oo):
@@ -341,7 +383,8 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
         caer2(f,port=port,RS=RS,RL=RL) 
     else: 
         bias={"type":"w","label":"unkw","dirrection":"right","parallel":False}
-        print("solution one for",f)   
+        print("solution one for",f)
+        Append("solution one for "+str(f))    
         s1=caer1(f,repeat=abs(S-M))
         s2=caer2(s1[2],gener=s1[1],repeat=S)
         s1[0].append(bias)
@@ -351,7 +394,8 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
         #first=threading.Thread(draw(s1,multi=True))
         #first.start()
         draw(s1[0],port=port,rs=RS,rl=RL)
-        print("\n","solution two for",f) 
+        print("\n","solution two for",f)
+        Append("solution two for "+str(f))  
         s2=caer2(f,repeat=S)
         s1=caer1(s2[2],gener=s2[1],repeat=abs(S-M))
         s2[0].append(bias)
@@ -359,6 +403,7 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
             s2[0].append(i)
         #second=threading.Thread(draw(s2,multi=True))
         #second.start()
+        Append("",finish=True)
         draw(s2[0],port=port,rs=RS,rl=RL)
 
 def tabetabdel(h,port):
@@ -366,6 +411,7 @@ def tabetabdel(h,port):
     S,M=degree(fraction(h)[0],gen=s),degree(fraction(h)[1])
     zeros,pols=solve(fraction(h)[0]),solve(fraction(h)[1])
     print("H(s)=",h,"zeros:",zeros,"pols:",pols)
+    Append("H(s)= "+str(h)+" zeros :"+' '.join(map(str, zeros)) +" pols :"+' '.join(map(str, pols))) 
     for i in pols:
         if im(i) !=0:
             gener="LC"
@@ -374,6 +420,7 @@ def tabetabdel(h,port):
     if gener=="LC":    
         x=M-1
         print(gener,"chosen degree",x)
+        Append(gener+" chosen degree "+str(x))
         if x==1:
             makhrag=s
         for i in range(x-1):
@@ -390,16 +437,19 @@ def tabetabdel(h,port):
         else:
             raise Exception("wrong port(z11 or y22)")
         print(gener,"chosen degree",x)
+        Append(gener+" chosen degree "+str(x))
         makhrag=sympify("1")
         for i in range(x):         #bug
                 b=(abs(pols[i+1])+abs(pols[i]))/2   
                 makhrag=makhrag*(s+b)
     if port=="z11":           
         f=fraction(h)[1]/makhrag
+        Append(port+" = "+str(f)+" m= "+str(S)+" n= "+str(M)+"\n") 
         print(port,"=",f,"m=",S,"n=",M,"\n") 
     elif port=="y22":
         f=fraction(h)[1]/makhrag
         print(port,"=",f,"m=",S,"n=",M,"\n") 
+        Append(port+" = "+str(f)+" m= "+str(S)+" n= "+str(M)+"\n") 
         f=1/f
     CORE(S,M,f,port=port)
 
@@ -467,6 +517,7 @@ def pr(z): #study for be real positive
     expr1=degree(fraction(z)[0])
     if abs(expr1-expr2)>1:
         print("real positive False (diffrence in degrees)")
+        Append("real positive False (diffrence in degrees)")
         return False
     expr2=Poly(fraction(z)[1]).all_coeffs()
     expr1=Poly(fraction(z)[0]).all_coeffs()
@@ -478,6 +529,7 @@ def pr(z): #study for be real positive
                     diffrent=abs(con2-con)
                     if diffrent>1:
                         print("real positive False (diffrence in lowest degrees)")
+                        Append("real positive False (diffrence in lowest degrees)")
                         return False
                     break    
                 con2=con2-1
@@ -489,43 +541,52 @@ def pr(z): #study for be real positive
     for i in expr2:
         if re(i).round()>0:
             print("real positive False (denominator negative mutliplayer)")
+            Append("real positive False (denominator negative mutliplayer)")
             return False
         if re(i).round()==0:
             a=Derivative(fraction(z)[1]).doit()
             a=a.subs(s, i)
             if a==0:
                 print("real positive False (repeated pols an jw is {})".format(i))
+                Append("real positive False (repeated pols an jw is {})".format(i))
                 return False   
     expr1=solve(fraction(z)[0])
     for i in expr1:
         if re(i).round()>0 :
             print("real positive False (numerator negative mutliplayer)")
+            Append("real positive False (numerator negative mutliplayer)")
             return False 
         if re(i).round()==0:
             a=Derivative(fraction(z)[0]).doit()
             a=a.subs(s, i)
             if a==0:
                 print("real positive False (repeated zero an jw is {})".format(i))
+                Append("real positive False (repeated zero an jw is {})".format(i))
                 return False   
     d=Hervits(fraction(z)[1]) 
     if d>0: 
         if d==2:
             if monde(z,expr2):
                 print("real positive True") 
+                Append("real positive True") 
                 return True
             else:
-                print("real positive False (monde haghighi nist)")   
+                print("real positive False (monde haghighi nist)") 
+                Append("real positive False (monde haghighi nist)")   
                 return False       
         else:
             print("real positive True") 
+            Append("real positive True")
             return True    
     else:
-        print("real positive False (denominator Hervits False)")   
+        print("real positive False (denominator Hervits False)") 
+        Append("real positive False (denominator Hervits False)")  
         return False 
 def monde(z,roots):
     for r in roots:
         d=Limit((s-r)*z, s,r).doit()
         print("Limit at ",r,"is ",d)
+        Append("Limit at "+str(r)+" is "+str(d))
         if im(d)==0 and re(d)>0:
             c=True
         else:
@@ -535,9 +596,11 @@ def monde(z,roots):
 def Hervits(z):  #study for being hervit
     roots=solve(z)
     print("denominator rots",roots)
+    Append("denominator rots "+" ".join(map(str, roots)))
     for i in roots:
         if re(i)>0:
             print("Hervits False (positive point)")
+            Append("Hervits False (positive point)")
             H=0
             return H
         if re(i)==0 :
@@ -545,18 +608,23 @@ def Hervits(z):  #study for being hervit
             a=a.subs(s, i)
             if a==0:
                 print("Hervits False (repeated on jw)")
+                Append("Hervits False (repeated on jw)")
                 H=0
                 return H
             else:
                 #now we most to check monde
                 print("weak Hervits")
+                Append("weak Hervits")
                 H=2
                 return H
         H=1
     if H==1 :
         print("Hervits True") 
+        Append("Hervits True")
         return H
-def PageThree(sorat,makhrag,RS=0,RL=oo):
+def PageThree(frame,sorat,makhrag,RS=0,RL=oo):
+    global sframe
+    sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
     #makhrag=(s**2+3*s+3)*(s**2-3*s+3)
     m=makhrag
@@ -642,8 +710,10 @@ def PageThree(sorat,makhrag,RS=0,RL=oo):
         print("Yin",ans)
     S,M=degree(fraction(ans)[0],gen=s),degree(fraction(ans)[1])
     CORE(S,M,ans)
-
-def Synthesis(sorat,makhrag,op,real=False):
+global sframe
+def Synthesis(frame,sorat,makhrag,op,real=False):
+    global sframe
+    sframe=frame
     #sorat=4+5*s+s**2
     #makhrag=2*s+s**2
     sorat,makhrag=simplify(sorat),simplify(makhrag)
@@ -651,12 +721,9 @@ def Synthesis(sorat,makhrag,op,real=False):
     expr1=expand(fraction(sorat/makhrag)[0])     
     rl1=expr1.as_ordered_terms('rev-lex')
     rl2=expr2.as_ordered_terms('rev-lex')  
-    t=reversetaghsim(rl1,rl2)  
-    print("test taghsim",t) 
     if real:
         if not pr(sorat/makhrag):
-            print("synthesis is not enforceable")
-            sys.exit()
+            return "synthesis is not enforceable"
     if op=="f1":
         faster1(sorat/makhrag)
     elif op=="f2":
@@ -665,7 +732,9 @@ def Synthesis(sorat,makhrag,op,real=False):
         caer1(sorat/makhrag)
     elif op=="c2":
         caer2(sorat/makhrag)
-def TransferFunction(sorat,makhrag,port):
+def TransferFunction(frame,sorat,makhrag,port):
+    global sframe
+    sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
     #sorat=k*s**4
     #makhrag=s**2+3*s+3
@@ -675,7 +744,9 @@ def TransferFunction(sorat,makhrag,port):
     #port=input("chose your port (z11,y22):")
     tabetabdel(sorat/makhrag,port)
 
-def Darlington(sorat,makhrag,port,RS=0,RL=oo):
+def Darlington(frame,sorat,makhrag,port,RS=0,RL=oo):
+    global sframe
+    sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
     #sorat=k*s**4
     #makhrag=(s+1)**4
@@ -714,13 +785,16 @@ def Darlington(sorat,makhrag,port,RS=0,RL=oo):
         f1=fraction(f)[1]/evenpart
         f0,f1=expand(f0),expand(f1)
         ans=f0/f1  
-    print("darlington =>",f,"numerator is",kind)    
+    print("darlington =>",f,"numerator is",kind)   
+    Append("darlington => "+str(f)+" numerator is "+str(kind))   
     print("even part:",evenpart,"odd part:",oddpart,"\n","H(s)=",ans) 
+    Append("even part: "+str(evenpart)+" odd part: "+str(oddpart)+"\n"+"H(s)= "+str(ans)) 
     if port=="y22": #consider negative multiplayer
         rl=1/RL
         #final=fraction(ans)[1]-rl
         final=f1-rl  #test
         print("\n",port,":",final,"\n")
+        Append("\n"+port+":"+str(final)+"\n")
         CORE(S,M,1/final,port=port,RL=rl)
         
     if port=="z11":
@@ -728,6 +802,19 @@ def Darlington(sorat,makhrag,port,RS=0,RL=oo):
         print(type(f1),type(RS))
         final=f1-RS
         print("\n",port,":",final,"\n")
+        Append("\n"+port+":"+str(final)+"\n")
         print("test",simplify(final))
-        CORE(S,M,final,port=port,RS=RS)          
-   
+        CORE(S,M,final,port=port,RS=RS) 
+def tolatex(msg):
+    return  latex(sympify(msg))              
+def Append(message,finish=False):
+    if finish:
+        sframe.configure(state='normal')
+        sframe.insert(END, 80*"-" + '\n')
+        sframe.configure(state='disabled')
+        sframe.yview(END) 
+    else:      
+        sframe.configure(state='normal')
+        sframe.insert(END, message + '\n')
+        sframe.configure(state='disabled')
+        sframe.yview(END)   
