@@ -1,7 +1,7 @@
 import sys
 from sympy import *
 from IPython.display import display
-import random
+from numpy import random
 import threading
 import schemdraw
 import schemdraw.elements as elm
@@ -71,15 +71,11 @@ def faster1(z):
         if fraction(r)[0] !=1:
             data=intelligent({"type":"y","data":i})
             data["dirrection"]="right"
-            if data["type"]=="r":
-                data["label"]=1/data["label"]
             buffers.append(data)
         else:   
             for j in i.args:
                 data=intelligent({"type":"y","data":j})
                 data["parallel"],data["dirrection"]=True,"right"
-                if data["type"]=="r":
-                    data["label"]=1/data["label"]
                 buffers.append(data)
     Append("# synthesis operation successfully completed ")            
     Append("",finish=True)            
@@ -143,8 +139,6 @@ def faster2(z):
         if fraction(i)[0] !=1:
             data=intelligent({"type":"Y","data":i})
             data["dirrection"]="down"
-            if data["type"]=="r":
-                data["label"]=1/data["label"]
             buffers.append(data)
         else:   
             for j in fraction(i)[1].args:
@@ -439,9 +433,15 @@ def tabetabdel(h,port):
         print(gener,"chosen degree",x)
         Append(gener+" chosen degree "+str(x))
         makhrag=sympify("1")
-        for i in range(x):         #bug
+        minimum=pols[0]
+        for i in pols:
+            if i>minimum:
+                minimum=i
+        makhrag=makhrag*(s+abs(minimum/2))
+        for i in range(x-1):         
                 b=(abs(pols[i+1])+abs(pols[i]))/2   
                 makhrag=makhrag*(s+b)
+    print(makhrag)            
     if port=="z11":           
         f=fraction(h)[1]/makhrag
         Append(port+" = "+str(f)+" m= "+str(S)+" n= "+str(M)+"\n") 
@@ -463,6 +463,11 @@ def draw(l,port="z11",rs=0,rl=oo):
         a0=d.add(elm.Resistor(d='up', label=str(rl)+'$\Omega$',color="red"))
         d.add(elm.Line(d="right"))     
     for i in l:
+        try:
+            if i["label"]==int(i["label"]):
+                i["label"]=int(i["label"])
+        except:
+            pass        
         if i["dirrection"]=="down" and  i["parallel"]: 
             F=F+1  
             if F<2:
@@ -513,8 +518,21 @@ def draw(l,port="z11",rs=0,rl=oo):
         d.add(elm.Line(d='up'))    
     d.draw()
 def pr(z): #study for be real positive
+    w=symbols("w",positive=True)
     expr2=degree(fraction(z)[1])
     expr1=degree(fraction(z)[0])
+    b=re(z.subs(s,w*I))
+    d=random.randint(100, size=(5)).tolist()
+    d.insert(0,0)
+    for i in d:
+       if b.subs(w,i)>=0:
+           pass
+       else: 
+           print("real positive False (Re(jw) >=0 @ w>=0)")
+           Append("real positive False (Re(jw) >=0 @ w>=0)")
+           return False
+    print("Re(jw) >=0 @ w>=0 is True")  
+    Append("Re(jw) >=0 @ w>=0 is True")       
     if abs(expr1-expr2)>1:
         print("real positive False (diffrence in degrees)")
         Append("real positive False (diffrence in degrees)")
@@ -622,105 +640,113 @@ def Hervits(z):  #study for being hervit
         print("Hervits True") 
         Append("Hervits True")
         return H
+def fourdimentionconj(root):
+    for i in root:
+        if im(i)==0 or re(i)==0 :
+            if -i in root: 
+                ans=True   
+            else:
+                return False  
+        else:
+            a1,a2=re(i)-im(i)*I,-re(i)+im(i)*I
+            if -i in root and a1 in root and a2 in root:    
+                ans=True
+            else:
+                return False                
+    try:
+        return ans
+    except:
+        return True    
 def PageThree(frame,sorat,makhrag,RS=0,RL=oo):
+    s,x,y,p,k=symbols('s x y p k')
+    from sympy import S
     global sframe
     sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
-    #makhrag=(s**2+3*s+3)*(s**2-3*s+3)
-    m=makhrag
-    #sorat=0.8888*s**4
-    makhrag=simplify(makhrag)
-    #ps=1-(S(sorat)/S(makhrag))
-    ps=1-(sorat/makhrag)
-    ps=cancel(ps)
-    #n=fraction(ps)[1].coeff(s,4)
-    n=LC(fraction(ps)[1])
-    #print('\n','divition by',n,'\n')
-    expr1=fraction(ps)[1]/n
-    expr2=fraction(ps)[0]/n
-    expr=expr2/factor(expr1)
-    roots=solve(fraction(expr)[0])
-    print('\n','zeros are ',roots,'\n')
-    print('\n','p(s)*p(-s)=',expr2,"/",expr1)
-    print('p(s)*p(-s)=',expr2,"/",m)
-    #print("test",factor(nth_power_roots_poly(expr2,1)))
+    f=UnevaluatedExpr(S.One*sorat/makhrag)*UnevaluatedExpr(S.One*sorat.subs(s,-s)/makhrag.subs(s,-s))
+    m=-4/int(RL)
+    print('\n','p(s)*p(-s)=',Add(1,m*f, evaluate=False))
+    x=f.doit()*-m
+    x=fraction(x)[0]
+    makhrag1,makhrag2=UnevaluatedExpr(makhrag),UnevaluatedExpr(makhrag.subs(s,-s))
+    print('p(s)*p(-s)=',Add(1,x/(makhrag1*makhrag2), evaluate=False))
+    n=(makhrag1*makhrag2-x).doit() #numerator
     #4 dimension conjunction detection
-    if int(degree(fraction(expr)[0])) & len(roots) ==4:  
-        n=1
-        print("4 dimension conjunction is ",True)
-    else:
-        pw=int(degree(fraction(expr)[0])) - len(roots)
-        for i in range(pw):
-            a=Derivative(fraction(expr)[0])
-            a=a.doit()
-        a=a.subs(s, 0)    
-        if a==0:
-            n=pw+1
-            print("Derivative at 0 is ",a,"and degree is ",n)
-            print("4 dimension conjunction is ",True)
-        else:   
-            print("Derivative at 0 is ",a) 
-            print("4 dimension conjunction is ",False)
-            raise("4 dimension conjunction Error")
+    zeros,pols=solve(n,rational=False),solve((makhrag1*makhrag2).doit())
+    print("P(s)*p(-s)","zeros:",zeros,"pols:",pols)
+    if fourdimentionconj(zeros):
+        print("4 dimension conjunction in numerator is ",True)
+    else:   
+        print("4 dimension conjunction in numerator is ",False)
+        return False
+    if fourdimentionconj(pols):
+        print("4 dimension conjunction in denominator is ",True)
+    else:   
+        print("4 dimension conjunction in denominator is ",False)
+        return False
 
-    numerator=factor(fraction(expr)[0],s)
-    print('numerator =>',numerator,expand(numerator))
-    print('denominator =>',factor(expr1),'\n')
-    #formul=(s-roots[0])**n
-    #print("(s-{})**{}".format(roots[0],n) ,"added to formul", formul)
-    #for i in roots[1:]:
-    #    formul=formul*(s-i)
-    #    print("(s-{})".format(i) ,"added to formul", cancel(formul))   
-    #print('diffrentation error= ',simplify(numerator-formul))
-    #print("test",factor(numerator,extension=sqrt(3)))
-    #print("test",factor(nth_power_roots_poly(numerator,1)))
-    ps=input("p(s) =")
-    ps=sympify(ps)
+    root=solve(n,rational=False)
+    numerator=sympify("1")
+    dx=Derivative(n).doit()
+    g,con=solve(dx),1
+    for i in root:
+        if i in g:
+            con=con+1
+            while 1:
+                dx=Derivative(dx)
+                if i in solve(dx):
+                    con=con+1
+                else:
+                    break
+            con=con/2    
+            numerator=numerator*s**Integer(con)   
+        elif i>0:
+            numerator=numerator*(s-i)
+    print('numerator =>',numerator)
+    #make p(s)
+    ps=numerator/makhrag1
     ps2=ps.subs(s,-s)
-    print('ps1 =',ps,'\n','ps2 =',ps2)
-    zin1=(fraction(ps)[1]+fraction(ps)[0])/(fraction(ps)[1]-fraction(ps)[0])
-    zin2=(1-ps2)/(1+ps2)
-    zin1,zin2=factor(zin1,s),factor(zin2,s)
-    print('zin1 =',zin1,'\n','zin2 =',zin2)
+    ps,ps2=ps.doit(),ps2.doit()
+    print('ps1 =',ps,'ps2 =',ps2)
+    zin1=int(RS)*(1+ps)/(1-ps)
+    zin2=int(RS)*(1-ps)/(1+ps)
+    print('zin1 =',zin1,'zin2 =',zin2)
     #choose zin
-    l1=limit_seq(zin1,s).doit()
-    l2=limit_seq(zin2,s).doit()
-    if im(l1)==0 or RL==1:
-        which="z11"
-    elif im(l2)==0:
-        which="y22"
-    print(l1,l2,which)
-    if which=="z11":
-        ans=apart(zin1).evalf()
-        print("Zin",ans)
-        ans=ans-ans.args[0]
-        n=fraction(ans)[0]
-        expr1=fraction(ans)[1]/n
-        expr2=fraction(ans)[0]/n
-        ans=expr1/expr2
-        print("Yin",ans)
-    elif which=="y22":
-        ans=apart(zin2).evalf()
-        print("Zin",ans)
-        ans=ans-ans.args[0]
-        n=fraction(ans)[0]
-        expr1=fraction(ans)[1]/n
-        expr2=fraction(ans)[0]/n
-        ans=expr1/expr2
-        print("Yin",ans)
+    S,M=degree(fraction(sorat)[0],gen=s),degree(fraction(makhrag)[1])
+    if S==0: #lowpass
+        kind=("Lowpass")
+        l1=Limit(zin1,s,0).doit()
+        l2=Limit(zin2,s,0).doit()
+        print(kind,"Limit at 0 for z1",l1,"for z2",l2)
+    elif S==M: #highpass
+        kind=("highpass")
+        l1=limit_seq(zin1,s).doit()
+        l2=limit_seq(zin2,s).doit()
+        print(kind,"Limit at oo for z1",l1,"for z2",l2)
+    if l1.is_real:
+        print("continue with z1")
+        z=zin1
+    else:  
+        print("continue with z2") 
+        z=zin2
+
+    ans=cancel(z)
+    #ans=ans-ans.args[0]
+    #n=fraction(ans)[0]
+    #expr1=fraction(ans)[1]/n
+    #expr2=fraction(ans)[0]/n
+    #ans=expr1/expr2
+
     S,M=degree(fraction(ans)[0],gen=s),degree(fraction(ans)[1])
     CORE(S,M,ans)
 global sframe
 def Synthesis(frame,sorat,makhrag,op,real=False):
+    s,x,y,p,k=symbols('s x y p k')
     global sframe
     sframe=frame
     #sorat=4+5*s+s**2
     #makhrag=2*s+s**2
-    sorat,makhrag=simplify(sorat),simplify(makhrag)
-    expr2=expand(fraction(sorat/makhrag)[1]) 
-    expr1=expand(fraction(sorat/makhrag)[0])     
-    rl1=expr1.as_ordered_terms('rev-lex')
-    rl2=expr2.as_ordered_terms('rev-lex')  
+    sorat,makhrag=simplify(sorat),simplify(makhrag)   
     if real:
         if not pr(sorat/makhrag):
             return "synthesis is not enforceable"
@@ -733,18 +759,14 @@ def Synthesis(frame,sorat,makhrag,op,real=False):
     elif op=="c2":
         caer2(sorat/makhrag)
 def TransferFunction(frame,sorat,makhrag,port):
+    s,x,y,p,k=symbols('s x y p k')
     global sframe
     sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
-    #sorat=k*s**4
-    #makhrag=s**2+3*s+3
-    #if not pr(sorat/makhrag):
-    #    print("synthesis is not enforceable")
-    #    sys.exit()
-    #port=input("chose your port (z11,y22):")
     tabetabdel(sorat/makhrag,port)
 
 def Darlington(frame,sorat,makhrag,port,RS=0,RL=oo):
+    s,x,y,p,k=symbols('s x y p k')
     global sframe
     sframe=frame
     sorat,makhrag=simplify(sorat),simplify(makhrag)
@@ -758,13 +780,7 @@ def Darlington(frame,sorat,makhrag,port,RS=0,RL=oo):
             break
         else:
             kind="odd"
-            break
-    for i in fraction(f)[0].args:
-        if i.is_number:
-            kind="even"
-            break
-        else:
-            kind="odd"
+            break      
     evenpart,oddpart="",""
     a=expand(fraction(f)[1])
     for i in a.args:
@@ -777,34 +793,32 @@ def Darlington(frame,sorat,makhrag,port,RS=0,RL=oo):
     evenpart,oddpart=sympify(evenpart),sympify(oddpart)
     if kind=="even":
         f0=fraction(f)[0]/oddpart
-        f1=fraction(f)[1]/oddpart
-        f0,f1=expand(f0),expand(f1)
-        ans=f0/f1
+        if port=="z11":
+            ans=Add(RS,evenpart/oddpart, evaluate=False)
+        else:
+            ans=Add(1/RL,evenpart/oddpart, evaluate=False)     
     else:
         f0=fraction(f)[0]/evenpart
-        f1=fraction(f)[1]/evenpart
-        f0,f1=expand(f0),expand(f1)
-        ans=f0/f1  
+        if port=="z11":
+            ans=Add(RS,oddpart/evenpart, evaluate=False)
+        else:
+            ans=Add(1/RL,oddpart/evenpart, evaluate=False)    
     print("darlington =>",f,"numerator is",kind)   
     Append("darlington => "+str(f)+" numerator is "+str(kind))   
-    print("even part:",evenpart,"odd part:",oddpart,"\n","H(s)=",ans) 
+    print("even part:",evenpart,"odd part:",oddpart,"\n","H(s)=",f0,"/",ans) 
     Append("even part: "+str(evenpart)+" odd part: "+str(oddpart)+"\n"+"H(s)= "+str(ans)) 
     if port=="y22": #consider negative multiplayer
         rl=1/RL
-        #final=fraction(ans)[1]-rl
-        final=f1-rl  #test
-        print("\n",port,":",final,"\n")
-        Append("\n"+port+":"+str(final)+"\n")
-        CORE(S,M,1/final,port=port,RL=rl)
+        ans=ans-rl
+        print("\n",port,":",ans,"\n")
+        Append("\n"+port+":"+str(ans)+"\n")
+        CORE(S,M,1/ans,port=port,RL=RL)
         
     if port=="z11":
-        #final=fraction(ans)[1]-rs
-        print(type(f1),type(RS))
-        final=f1-RS
-        print("\n",port,":",final,"\n")
-        Append("\n"+port+":"+str(final)+"\n")
-        print("test",simplify(final))
-        CORE(S,M,final,port=port,RS=RS) 
+        ans=ans-RS
+        print("\n",port,":",ans,"\n")
+        Append("\n"+port+":"+str(ans)+"\n")
+        CORE(S,M,ans,port=port,RS=RS,RL=0) 
 def tolatex(msg):
     return  latex(sympify(msg))              
 def Append(message,finish=False):

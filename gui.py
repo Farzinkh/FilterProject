@@ -1,10 +1,26 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.scrolledtext as scrolledtext
 from Filter import TransferFunction,Darlington,Synthesis,PageThree
 from sympy import oo
 LARGE_FONT= ("Verdana", 12)
 x,y=648,520
-def raise_frame(frame):
+def raise_frame(frame,kind=""):
+    global page
+
+    if kind=="S":
+        page=Synthesisconf
+        Refresher()
+    elif kind=="D":
+        page=Darlingtonconf
+        Refresher()  
+    elif kind=="P":
+        page=PageThreeconf
+        Refresher()  
+    elif kind=="T":
+        page=TransferFunctionconf
+        Refresher()            
+       
     frame.tkraise()
 
 root = tk.Tk()
@@ -26,7 +42,7 @@ def takevalue(entry):
     print(name)
 
 def StartPage():
-    label = tk.Label(startpage,text="please choose your operation from this options", font=LARGE_FONT)
+    label = tk.Label(startpage,text="Please choose your operation from this options", font=LARGE_FONT)
     startpage.rowconfigure([0,1], weight=1)
     startpage.columnconfigure([0], weight=1)
     card_frame = tk.Frame(startpage)
@@ -39,31 +55,32 @@ def StartPage():
             width=15, height=5,
             #bg="azure",
             borderwidth=2,
-            command=lambda: raise_frame(synthesis))
+            command=lambda: raise_frame(synthesis,"S"))
     btn.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     btn1 = tk.Button(card_frame,
             text="Darlington",
             width=15, height=5,
             #bg="azure",
             borderwidth=2,
-            command=lambda: raise_frame(darlington))
+            command=lambda: raise_frame(darlington,"D"))
     btn1.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     btn2 = tk.Button(card_frame,
             text="P(S)*P(-S)",
             width=15, height=5,
             #bg="azure",
             borderwidth=2,
-            command=lambda: raise_frame(pageThree))
+            command=lambda: raise_frame(pageThree,"P"))
     btn2.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     btn3 = tk.Button(card_frame,
             text="Transfer Function",
             width=15, height=5,
             #bg="azure",
             borderwidth=2,
-            command=lambda: raise_frame(transferFunction))
+            command=lambda: raise_frame(transferFunction,"T"))
     btn3.grid(row=1, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
 
 def Synthesisframe():
+    global Synthesisconf
     label = tk.Label(synthesis,text="Synthesis", font=LARGE_FONT)
     synthesis.rowconfigure([0,1,2], weight=1)
     synthesis.columnconfigure([0,1], weight=1)
@@ -75,22 +92,24 @@ def Synthesisframe():
     card_frame.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
-    label = tk.Label(card_frame,text="enter Z numerator")
+    label = tk.Label(card_frame,text="Enter Z numerator",font=LARGE_FONT,anchor="w")
     sorat = tk.Entry(card_frame)
     sorat.insert(0,"4+5*s+s**2")
-    label.grid(row=1,column=2)
+    label.grid(row=1,column=2,sticky="W")
     sorat.grid(row=1,column=1)
-    label2 = tk.Label(card_frame,text="enter Z denominator")
+    label2 = tk.Label(card_frame,text="Enter Z denominator",font=LARGE_FONT,anchor="w")
     makhrag = tk.Entry(card_frame)
-    label2.grid(row=2,column=2)
+    label2.grid(row=2,column=2,sticky="W")
     makhrag.grid(row=2,column=1)
     makhrag.insert(0,"2*s+s**2")
-    label3 = tk.Label(card_frame,text="z=4+5s+s^2/2s+s^2")
+    label3 = tk.Label(card_frame,text="z=4+5s+s^2/2s+s^2",font=LARGE_FONT)
     label3.grid(row=1,column=0)
-    text_box = tk.Text(synthesis)
+    Synthesisconf={"Frame":card_frame,"Label":label3,"Sorat":sorat,"Makhrag":makhrag}
+    text_box =scrolledtext.ScrolledText(synthesis, undo=True)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-    #text_box.insert("1.0", "Hello")
-    #text_box.insert("2.0", "\nWorld")
+    clearbtn=tk.Button(card_frame, text="Clear", 
+                    command=lambda: clearTextInput(text_box))
+    clearbtn.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     real=tk.Checkbutton(synthesis, text="real positive",font=LARGE_FONT,variable=realpositive, onvalue=1, offvalue=0)
     real.grid(row=1,column=1)
     card_frame2 = tk.Frame(synthesis)
@@ -119,6 +138,7 @@ def Synthesisframe():
     #t.configure(yscrollcommand=scroll.set)
 
 def Darlingtonframe():
+    global Darlingtonconf
     label = tk.Label(darlington,text="Darlington", font=LARGE_FONT)
     darlington.rowconfigure([0,1,2], weight=1)
     darlington.columnconfigure([0,1], weight=1)
@@ -132,20 +152,24 @@ def Darlingtonframe():
     card_frame.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
-    label = tk.Label(card_frame,text="enter Z numerator")
+    label = tk.Label(card_frame,text="Enter H(s) numerator",font=LARGE_FONT)
     sorat = tk.Entry(card_frame,exportselection=0)
     sorat.insert(0,"k*s**4")
-    label.grid(row=1,column=2)
+    label.grid(row=1,column=2,sticky="W")
     sorat.grid(row=1,column=1)
-    label2 = tk.Label(card_frame,text="enter Z denominator")
+    label2 = tk.Label(card_frame,text="Enter H(s) denominator",font=LARGE_FONT)
     makhrag = tk.Entry(card_frame,exportselection=0)
     makhrag.insert(0,"(s+1)**4")
-    label2.grid(row=2,column=2)
+    label2.grid(row=2,column=2,sticky="W")
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/((s+1)^4)")
+    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/((s+1)^4)",font=LARGE_FONT)
     label3.grid(row=1,column=0)
-    text_box = tk.Text(darlington)
+    Darlingtonconf={"Frame":card_frame,"Label":label3,"Sorat":sorat,"Makhrag":makhrag}
+    text_box =scrolledtext.ScrolledText(darlington, undo=True)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    clearbtn=tk.Button(card_frame, text="Clear", 
+                    command=lambda: clearTextInput(text_box))
+    clearbtn.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2 = tk.Frame(darlington)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
@@ -156,8 +180,8 @@ def Darlingtonframe():
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
             value = "y22", indicator = 0,command=lambda: Darlingtonframesubmit(text_box,card_frame2,sorat,makhrag),
             ).grid(row=1, column=0,sticky='nesw')        
-
 def PageThreeframe():
+    global  PageThreeconf
     label = tk.Label(pageThree,text="P(S)*P(-S)", font=LARGE_FONT)
     pageThree.rowconfigure([0,1,2], weight=1)
     pageThree.columnconfigure([0,1], weight=1)
@@ -171,20 +195,24 @@ def PageThreeframe():
     card_frame.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
-    label = tk.Label(card_frame,text="enter Z numerator")
+    label = tk.Label(card_frame,text="Enter H(s) numerator",font=LARGE_FONT)
     sorat = tk.Entry(card_frame,exportselection=0)
     sorat.insert(0,"2*s**2")
-    label.grid(row=1,column=2)
+    label.grid(row=1,column=2,sticky="W")
     sorat.grid(row=1,column=1)
-    label2 = tk.Label(card_frame,text="enter Z denominator")
+    label2 = tk.Label(card_frame,text="Enter H(s) denominator",font=LARGE_FONT)
     makhrag = tk.Entry(card_frame,exportselection=0)
     makhrag.insert(0,"5*s**3+4*(s+2)**2")
-    label2.grid(row=2,column=2)
+    label2.grid(row=2,column=2,sticky="W")
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="H(s)=(2*s**2)/5*s**3+4*(s+2)**2")
+    label3 = tk.Label(card_frame,text="H(s)=(2*s**2)/5*s**3+4*(s+2)**2",font=LARGE_FONT)
     label3.grid(row=1,column=0)
-    text_box = tk.Text(pageThree)
+    PageThreeconf={"Frame":card_frame,"Label":label3,"Sorat":sorat,"Makhrag":makhrag}
+    text_box =scrolledtext.ScrolledText(pageThree, undo=True)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    clearbtn=tk.Button(card_frame, text="Clear", 
+                    command=lambda: clearTextInput(text_box))
+    clearbtn.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2 = tk.Frame(pageThree)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
@@ -197,9 +225,10 @@ def PageThreeframe():
     rl.grid(row=1, column=1, sticky='ew')  
     button1 = tk.Button(card_frame2,text="submit",width=15,
                         command=lambda: PageThreeframesubmit(text_box,sorat,makhrag,rl,rs) )
-    button1.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
+    button1.grid(row=2, column=1, sticky=tk.E+tk.W)
       
 def TransferFunctionframe():
+    global TransferFunctionconf
     label = tk.Label(transferFunction,text="Transfer Function", font=LARGE_FONT)
     transferFunction.rowconfigure([0,1,2], weight=1)
     transferFunction.columnconfigure([0,1], weight=1)
@@ -213,20 +242,24 @@ def TransferFunctionframe():
     card_frame.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame.rowconfigure([0,1], weight=1)
     card_frame.columnconfigure([0,1,2], weight=1)
-    label = tk.Label(card_frame,text="enter Z numerator")
+    label = tk.Label(card_frame,text="Enter H(s) numerator",font=LARGE_FONT)
     sorat = tk.Entry(card_frame,exportselection=0)
     sorat.insert(0,"k*s**4")
-    label.grid(row=1,column=2)
+    label.grid(row=1,column=2,sticky="W")
     sorat.grid(row=1,column=1)
-    label2 = tk.Label(card_frame,text="enter Z denominator")
+    label2 = tk.Label(card_frame,text="Enter H(s) denominator",font=LARGE_FONT)
     makhrag = tk.Entry(card_frame,exportselection=0)
     makhrag.insert(0,"s**2+3*s+3")
-    label2.grid(row=2,column=2)
+    label2.grid(row=2,column=2,sticky="W")
     makhrag.grid(row=2,column=1)
-    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/(s^2+3s+3)")
+    label3 = tk.Label(card_frame,text="H(s)=(ks^4)/(s^2+3s+3)",font=LARGE_FONT)
     label3.grid(row=1,column=0)
-    text_box = tk.Text(transferFunction)
+    TransferFunctionconf={"Frame":card_frame,"Label":label3,"Sorat":sorat,"Makhrag":makhrag}
+    text_box =scrolledtext.ScrolledText(transferFunction, undo=True)
     text_box.grid(row=2,column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+    clearbtn=tk.Button(card_frame, text="Clear", 
+                    command=lambda: clearTextInput(text_box))
+    clearbtn.grid(row=2, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2 = tk.Frame(transferFunction)
     card_frame2.grid(row=2, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
     card_frame2.rowconfigure([0,1,2], weight=1)
@@ -237,7 +270,6 @@ def TransferFunctionframe():
     tk.Radiobutton(card_frame2, text = "Y22", variable = port,width=15,  
             value = "y22", indicator = 0,command=lambda: TransferFunctionframesubmit(text_box,sorat,makhrag,port="y22"),
             ).grid(row=1, column=0,sticky='nesw')
-
 
  
 def click(event):  
@@ -267,7 +299,13 @@ def Darlingtonframesubmit(text_box,frame,sorat,makhrag):
         button1 = tk.Button(card_frame,text="submit",width=15,
                         command=lambda: DarlingtonFramesubmit(text_box,sorat.get(),makhrag.get(),port.get(),RL=rl.get()))
         button1.grid(row=2,column=0)       
-
+def Refresher():
+    if Synthesisconf==page:
+        ad="Z(s)="
+    else:
+        ad="H(s)="    
+    page["Label"].configure(text=ad+"({})/({})".format(page["Sorat"].get(),page["Makhrag"].get()))
+    page["Frame"].after(1000, Refresher)
 def DarlingtonFramesubmit(text_box,sorat,makhrag,port,RS=0,RL=oo):
     print(sorat,makhrag,port,RS,RL)
     if RL==oo:
@@ -284,7 +322,16 @@ def Synthesisframesubmit(text_box,sorat,makhrag,op,real=False):
     Synthesis(text_box,sorat.get(),makhrag.get(),op,real)
 def PageThreeframesubmit(text_box,sorat,makhrag,rl,rs):
     print(sorat.get(),makhrag.get(),rl.get(),rs.get())
-    PageThree(text_box,sorat.get(),makhrag.get(),RS=rs.get(),RL=rl.get())
+    if PageThree(text_box,sorat.get(),makhrag.get(),RS=rs.get(),RL=rl.get()):
+        pass
+    else:
+        text_box.configure(state='normal')
+        text_box.insert(tk.END, "The Operation is not executive" + '\n')
+        text_box.insert(tk.END, 80*"-" + '\n')
+        text_box.configure(state='disabled')
+        text_box.yview(tk.END) 
+def clearTextInput(frame):
+    frame.delete("1.0","end")
 def toturial():
     from tkinter import messagebox
     messagebox.showinfo( "Tutorial", "In the home page you most choose one operation by clicking on it and after that another window pops up which you most to "+ 
@@ -312,7 +359,7 @@ root.title("LC & RC Filter")
 root.bind('<Escape>', lambda e: root.destroy())
 root.protocol("WM_DELETE_WINDOW", root.iconify)
 raise_frame(startpage)
-print("root grids",root.grid_size() )
+#print("root grids",root.grid_size() )
 #print(ttk.Style().theme_names())
 ttk.Style().theme_use('xpnative')
 root.mainloop()
