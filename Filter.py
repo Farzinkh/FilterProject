@@ -248,10 +248,11 @@ def caer1(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
                     buffers.append(data)
                     print("# synthesis operation successfully completed cauer2 to cauer1")
                     Append("# synthesis operation successfully completed cauer2 to cauer1")      
-                if santez=="Y":
-                    v=1/v 
+                else:
                     print("# synthesis continues by cauer2")
-                    Append("# synthesis continues by cauer2")  
+                    Append("# synthesis continues by cauer2") 
+                if santez=="Y":
+                    v=1/v  
                 return [buffers,gener,v.evalf()]
         if Derivative(v,s).doit()==0 and v!=0:
             anslist.append(v)
@@ -368,10 +369,11 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
                     buffers.append(data) 
                     print("# synthesis operation successfully completed cauer1 to caer2")
                     Append("# synthesis operation successfully completed cauer1 to caer2")   
-                if santez=="Y":
-                    z=1/z    
+                else:    
                     print("# synthesis continues by cauer1")
                     Append("# synthesis continues by cauer1")
+                if santez=="Y":
+                    z=1/z    
                 return [buffers,gener,z]
         if Derivative(z,s).doit()==0 and z!=0:
             anslist.append(z)
@@ -416,6 +418,7 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
             s1[0].append(i)
         #draw(s1[0],port,RS,RL)
         Append(40*"- ")
+        ans1=s1[0]
         print("\n","solution two for",f)
         Append("solution two for "+str(f))  
         s2=caer2(f,repeat=S)
@@ -436,7 +439,7 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
         card_frame.rowconfigure([0], weight=1)
         card_frame.columnconfigure([0,1], weight=1)
         solution1 = ttk.Button(card_frame,text="plot solution one",width=15,
-                            command=lambda: draw(s1[0],port,RS,RL))
+                            command=lambda: draw(ans1,port,RS,RL))
         solution1.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
         solution2 = ttk.Button(card_frame,text="plot solution two",width=15,
                             command=lambda: draw(s2[0],port,RS,RL))
@@ -462,17 +465,19 @@ def tabetabdel(h,port):
             gener="LC"
             break
         gener="RC"   
-    if gener=="LC":    
+    if gener=="LC":  
+        for i in pols:
+            if -i in pols:
+                pols.remove(i)
+        l=M/2 
         x=M-1
         print(gener,"chosen degree",x)
         Append(gener+" chosen degree "+str(x))
-        if x==1:
-            makhrag=s
-        for i in range(x-1):
+        for i in range(l):
             if i==0:
                 makhrag=s
             else:
-                a=abs(pols[i]**2-pols[i-1]**2)/2
+                a=abs(pols[i]**2+pols[i-1]**2)/2
                 makhrag=makhrag*(s**2+a)
     else:
         if port=="z11":
@@ -488,10 +493,26 @@ def tabetabdel(h,port):
         for i in pols:
             if i>minimum:
                 minimum=i
-        makhrag=makhrag*(s+abs(minimum/2))
-        for i in range(x-1):         
+        if port=="z11":
+            #pols.reverse()              
+            makhrag=makhrag*(s+abs(minimum/2))
+            for i in range(x):
+                if i==0:
+                    continue 
+                i=i-1   
+                print("makhrag"+str(i),makhrag)
                 b=(abs(pols[i+1])+abs(pols[i]))/2   
                 makhrag=makhrag*(s+b)
+        elif port=="y22":
+            b=(abs(pols[0])+abs(pols[1]))/2   
+            makhrag=makhrag*(s+b)
+            for i in range(x):
+                    if i==0:
+                        continue 
+                    #i=i-1   
+                    print("makhrag"+str(i),makhrag)
+                    b=(abs(pols[i+1])+abs(pols[i]))/2   
+                    makhrag=makhrag*(s+b)
     print(makhrag)            
     if port=="z11":           
         f=fraction(h)[1]/makhrag
@@ -505,7 +526,6 @@ def tabetabdel(h,port):
     CORE(S,M,f,port=port)
 
 def draw(l,port="z11",rs=0,rl=oo):
-    print("i am in draw")
     #example
     #l=[{type:"r",label:2,dirrection:"right",parallel:False]},{type:"l",label:100,dirrection:"down",parallel:True},{type:"c",label:56,dirrection:"right",parallel:True}] 
     d ,F= schemdraw.Drawing(inches_per_unit=.5),0
@@ -569,7 +589,6 @@ def draw(l,port="z11",rs=0,rl=oo):
         d.add(elm.Line('left', tox=a0.start)) 
         d.add(elm.Line(d='up')) 
     d.draw()
-    print("done")
 def pr(z): #study for be real positive
     w=symbols("w",positive=True)
     expr2=degree(fraction(z)[1])
