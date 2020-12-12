@@ -6,9 +6,8 @@ from tkthread import tk, TkThread
 from ttkthemes import ThemedStyle
 from ttkthemes import ThemedTk
 from Filter import TransferFunction,Darlington,Synthesis,PageThree
+from tkinter import messagebox
 
-LARGE_FONT= ("Verdana", 12)
-x,y=648,520
 def raise_frame(frame,kind=""):
     global page
 
@@ -23,23 +22,8 @@ def raise_frame(frame,kind=""):
         Refresher()  
     elif kind=="T":
         page=TransferFunctionconf
-        Refresher()            
-       
+        Refresher()                   
     frame.tkraise()
-
-#root = tk.Tk()
-root=ThemedTk(theme="adapta")
-realpositive = tk.IntVar()
-port = tk.StringVar() 
-
-global startpage,synthesis,darlington,pageThree,transferFunction
-startpage = tk.Frame(root)
-synthesis = tk.Frame(root)
-darlington = tk.Frame(root)
-pageThree = tk.Frame(root)
-transferFunction = tk.Frame(root)
-for frame in (startpage, synthesis, darlington, pageThree,transferFunction):
-    frame.grid(row=0, column=0, sticky='news')
 
 def takevalue(entry):
     name=entry.get()
@@ -328,31 +312,53 @@ def clearTextInput(frame):
     frame.configure(state='normal')
     frame.delete(1.0,"end") 
 def toturial():
-    from tkinter import messagebox
     messagebox.showinfo( "Tutorial", "In the home page you have to choose one operation by clicking on it and after that another window comes ahead which you most to "+ 
                             "enter your evaluation numerator and demoninator separately,Attention!! difined symbols are just (s,k) dont try anything else because you got Error if you want to add square of any number just type 'sqrt(number)' and"+  
                             " for adding any power just type'number**power',There is no diffrence between number and symbols in this situations.")    
-StartPage()
-Synthesisframe()
-Darlingtonframe()
-PageThreeframe()
-TransferFunctionframe()
-root.update_idletasks()  # Update "requested size" from geometry manager
-a,a0=str(x),x/2
-b,b0=str(y),y/2
-#root.geometry(a+"x"+b)
-root.geometry("+%d+%d" % ((root.winfo_screenwidth()/2 )-a0, (root.winfo_screenheight()/3)-b0))
-root.deiconify()
-root.resizable(width=False, height=False)
-menubar = tk.Menu(root)
-filemenu = tk.Menu(menubar, tearoff=0)
-filemenu.add_command(label="Tutorial", command=toturial)
-filemenu.add_command(label="Exit", command=root.destroy)
-menubar.add_cascade(label="MENU", menu=filemenu)
-root.config(menu=menubar)
-root.title("LC & RC Filter")
-root.bind('<Escape>', lambda e: root.destroy())
-root.protocol("WM_DELETE_WINDOW", root.iconify)
-raise_frame(startpage)
-#print("root grids",root.grid_size() )
-root.mainloop()
+def About():
+    messagebox.showinfo("About","this application is developed for laboratorial research goals "+
+    "by Farzin khodaveisi electronical engineering student at Bu-Ali Sina university "+
+    "first release at December 2020")
+
+def main():
+    global LARGE_FONT,realpositive,port
+    LARGE_FONT= ("Verdana", 12)
+    x,y=648,520
+    #root = tk.Tk()
+    root=ThemedTk(theme="adapta")
+    realpositive = tk.IntVar()
+    port = tk.StringVar() 
+    global startpage,synthesis,darlington,pageThree,transferFunction
+    startpage = tk.Frame(root)
+    synthesis = tk.Frame(root)
+    darlington = tk.Frame(root)
+    pageThree = tk.Frame(root)
+    transferFunction = tk.Frame(root)
+    for frame in (startpage, synthesis, darlington, pageThree,transferFunction):
+        frame.grid(row=0, column=0, sticky='news')
+    StartPage()
+    Synthesisframe()
+    Darlingtonframe()
+    PageThreeframe()
+    TransferFunctionframe()
+    root.update_idletasks()  # Update "requested size" from geometry manager
+    a,a0=str(x),x/2
+    b,b0=str(y),y/2
+    root.geometry("+%d+%d" % ((root.winfo_screenwidth()/2 )-a0, (root.winfo_screenheight()/3)-b0))
+    root.deiconify()
+    root.resizable(width=False, height=False)
+    menubar = tk.Menu(root)
+    filemenu = tk.Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Tutorial", command=toturial)
+    filemenu.add_command(label="About", command=About)
+    filemenu.add_command(label="Exit", command=root.destroy)
+    menubar.add_cascade(label="MENU", menu=filemenu)
+    root.config(menu=menubar)
+    root.title("LC & RC Filter")
+    root.bind('<Escape>', lambda e: root.destroy())
+    root.protocol("WM_DELETE_WINDOW", root.iconify)
+    raise_frame(startpage)
+    root.mainloop()    
+
+if __name__ == '__main__':
+    main()
