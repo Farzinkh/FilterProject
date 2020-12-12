@@ -87,7 +87,6 @@ def faster1(z):
             g=g+str(ans[0])
         else:    
             g=g+str(ans[0])+" + "             
-    print(g) 
     Append(g)              
     Append("# synthesis operation successfully completed by foster1")            
     Append("",finish=True)            
@@ -165,7 +164,6 @@ def faster2(z):
             g=g+str(ans[0])
         else:    
             g=g+str(ans[0])+" + "
-    print(g) 
     Append(g)           
     Append("# synthesis operation successfully completed by foster2")             
     Append("",finish=True)            
@@ -352,7 +350,6 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
         data["dirrection"]=firstdirrection
         buffers.append(data)
         if repeat:
-            print("i khow it is repeat and cont is",cont,t[0],z)
             if Derivative(t[0],s).doit() !=0:
                 cont=cont-1
             if cont==0:
@@ -413,7 +410,6 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
         s1=caer1(f,repeat=abs(S-M))
         s2=caer2(s1[2],gener=s1[1],repeat=S)
         s1[0].append(bias)
-        print("s2[0]","is ",s2[0])
         for i in s2[0]:
             s1[0].append(i)
         #draw(s1[0],port,RS,RL)
