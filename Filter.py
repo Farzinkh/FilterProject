@@ -1,15 +1,16 @@
-import sys,time,math
-from sympy import *
-from IPython.display import display
-from numpy import random
-from threading import Thread
+import math
+import tkinter.ttk as ttk
+
+import matplotlib.pyplot as plt
+import numpy as np
 import schemdraw
 import schemdraw.elements as elm
-import matplotlib.pyplot as plt
+from numpy import random
+from scipy import signal
+from sympy import *
 from tkthread import tk
-import tkinter.ttk as ttk
 from ttkthemes import ThemedTk
-plt.xkcd()
+
 init_printing(use_unicode=False, wrap_line=True)
 s,x,y,p,k=symbols('s x y p k')
 def intelligent(f): #f is dic {type:"y",data:4*s}
@@ -399,6 +400,9 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
     draw(buffers,port=port,rs=RS,rl=RL)
 
 def CORE(S,M,f,port="z11",RS=0,RL=oo):
+
+    Bode(fraction(f)[0], fraction(f)[1])
+
     if S==0:
         caer1(f,port=port,RS=RS,RL=RL)
     elif S==M: 
@@ -443,13 +447,6 @@ def CORE(S,M,f,port="z11",RS=0,RL=oo):
         window.resizable(width=False, height=False)
         window.deiconify()
         window.mainloop()
-        #second=Thread(target=lambda : draw(s2[0],port,RS,RL))
-        #second.start()
-        #draw(s2[0],port,RS,RL)
-    
-        #first=Thread(target=lambda : draw(s1[0],port,RS,RL))
-        #first.start()
-        #draw(s1[0],port,RS,RL)
 def tabetabdel(h,port):
     #global lock
     S,M=degree(fraction(h)[0],gen=s),degree(fraction(h)[1])
@@ -524,67 +521,68 @@ def tabetabdel(h,port):
 def draw(l,port="z11",rs=0,rl=oo):
     #example
     #l=[{type:"r",label:2,dirrection:"right",parallel:False]},{type:"l",label:100,dirrection:"down",parallel:True},{type:"c",label:56,dirrection:"right",parallel:True}] 
-    d ,F= schemdraw.Drawing(inches_per_unit=.5),0
-    if port=='z11':
-        a0=d.add(elm.Resistor(d='right', label=str(rs)+'$\Omega$',color="red")) 
-    if port=='y22':
-        a0=d.add(elm.Resistor(d='up', label=str(rl)+'$\Omega$',color="red"))
-        d.add(elm.Line(d="right"))     
-    for q in l:
-        try:
-            if q["label"]==int(q["label"]):
-                q["label"]=int(q["label"])
-        except:
-            pass        
-        if q["dirrection"]=="down" and  q["parallel"]: 
-            F=F+1  
-            if F<2:
-                d.add(elm.Line(d='right'))
-                d.push()  
-        elif q["dirrection"]=="down":
-            d.push()
-        elif q["parallel"] :
-            F=F+1  
-            if F<2:
-                 d.push()          
-        if q["type"]=="r":
-            d.add(elm.Resistor(d=q["dirrection"], label=str(q["label"])+'$\Omega$'))
-        elif q["type"]=="l":
-            d.add(elm.Inductor(d=q["dirrection"], label=str(q["label"])+"H"))
-        elif q["type"]=="c":
-            d.add(elm.Capacitor(d=q["dirrection"], label=str(q["label"])+'$\mu$F')) 
-        elif q["type"]=="w":    
-            d.add(elm.Line(d=q["dirrection"]))
-        if q["dirrection"]=="down" and  q["parallel"]:              
-            if F<2:
-                pass
-            else:
+    with plt.xkcd():
+        d ,F= schemdraw.Drawing(inches_per_unit=.5),0
+        if port=='z11':
+            a0=d.add(elm.Resistor(d='right', label=str(rs)+'$\Omega$',color="red")) 
+        if port=='y22':
+            a0=d.add(elm.Resistor(d='up', label=str(rl)+'$\Omega$',color="red"))
+            d.add(elm.Line(d="right"))     
+        for q in l:
+            try:
+                if q["label"]==int(q["label"]):
+                    q["label"]=int(q["label"])
+            except:
+                pass        
+            if q["dirrection"]=="down" and  q["parallel"]: 
+                F=F+1  
+                if F<2:
+                    d.add(elm.Line(d='right'))
+                    d.push()  
+            elif q["dirrection"]=="down":
+                d.push()
+            elif q["parallel"] :
+                F=F+1  
+                if F<2:
+                    d.push()          
+            if q["type"]=="r":
+                d.add(elm.Resistor(d=q["dirrection"], label=str(q["label"])+'$\Omega$'))
+            elif q["type"]=="l":
+                d.add(elm.Inductor(d=q["dirrection"], label=str(q["label"])+"H"))
+            elif q["type"]=="c":
+                d.add(elm.Capacitor(d=q["dirrection"], label=str(q["label"])+'$\mu$F')) 
+            elif q["type"]=="w":    
+                d.add(elm.Line(d=q["dirrection"]))
+            if q["dirrection"]=="down" and  q["parallel"]:              
+                if F<2:
+                    pass
+                else:
+                    d.pop()
+                    F=0    
+            elif q["dirrection"]=="right" and  q["parallel"]:   
+                if F<2:
+                    d.pop()
+                    d.add(elm.Line(d='down'))  
+                else:
+                    d.add(elm.Line(d='up'))
+                    F=0                      
+            elif q["dirrection"]=="down": 
+                d.add(elm.Line(d='down')) 
                 d.pop()
-                F=0    
-        elif q["dirrection"]=="right" and  q["parallel"]:   
-            if F<2:
-                d.pop()
-                d.add(elm.Line(d='down'))  
-            else:
-                d.add(elm.Line(d='up'))
-                F=0                      
-        elif q["dirrection"]=="down": 
-            d.add(elm.Line(d='down')) 
-            d.pop()
-    d.add(elm.Line(d='right'))
-    if port=='z11':
-        d.add(elm.Resistor(d='down', label=str(rl)+'$\Omega$',color="red")) 
-        d.add(elm.Line(d='down'))
-        d.add(elm.Line('left', tox=a0.start)) 
-        d.add(elm.SourceSin(d='up', label='10V')) 
-        d.add(elm.Line(d='up'))
-    if port=='y22':
-        d.add(elm.Resistor(d='right', label=str(rs)+'$\Omega$',color="red")) 
-        d.add(elm.SourceSin(d='down', label='10V')) 
-        d.add(elm.Line(d='down'))
-        d.add(elm.Line('left', tox=a0.start)) 
-        d.add(elm.Line(d='up')) 
-    d.draw()
+        d.add(elm.Line(d='right'))
+        if port=='z11':
+            d.add(elm.Resistor(d='down', label=str(rl)+'$\Omega$',color="red")) 
+            d.add(elm.Line(d='down'))
+            d.add(elm.Line('left', tox=a0.start)) 
+            d.add(elm.SourceSin(d='up', label='10V')) 
+            d.add(elm.Line(d='up'))
+        if port=='y22':
+            d.add(elm.Resistor(d='right', label=str(rs)+'$\Omega$',color="red")) 
+            d.add(elm.SourceSin(d='down', label='10V')) 
+            d.add(elm.Line(d='down'))
+            d.add(elm.Line('left', tox=a0.start)) 
+            d.add(elm.Line(d='up'))  
+        d.draw()
 def pr(z): #study for be real positive
     w=symbols("w",positive=True)
     expr2=degree(fraction(z)[1])
@@ -823,6 +821,9 @@ def Synthesis(frame,sorat,makhrag,op,real=False):
     if real:
         if not pr(sorat/makhrag):
             return "synthesis is not enforceable"
+
+    Bode(sorat, makhrag)    
+
     if op=="f1":
         faster1(sorat/makhrag)
     elif op=="f2":
@@ -831,6 +832,7 @@ def Synthesis(frame,sorat,makhrag,op,real=False):
         caer1(sorat/makhrag)
     elif op=="c2":
         caer2(sorat/makhrag)
+ 
 def TransferFunction(frame,sorat,makhrag,port):
     s,x,y,p,k=symbols('s x y p k')
     global sframe
@@ -905,3 +907,43 @@ def Append(message,finish=False):
         sframe.insert(tk.END, message + '\n')
         sframe.configure(state='disabled')
         sframe.yview(tk.END)   
+
+def sympy_to_numpy(evaluation):
+    evaluation=Poly(evaluation.expand(),s)
+    evallist=evaluation.all_coeffs() 
+    return np.array(evallist,dtype=float)
+
+def Bode(Numerator, denominator):
+    """plot bode graph for signals
+
+    Args:
+        Numerator : (sympy evaluation): ,
+        denominator : (sympy evaluation) 
+    """
+    Numlist=sympy_to_numpy(Numerator)
+    denomlist=sympy_to_numpy(denominator)      
+    wz, mag, phase =signal.bode((Numlist, denomlist),n=1000)
+    plt.style.use('default')
+    fig = plt.figure(figsize=(12, 6))
+    fig.suptitle('Bode graph', fontsize=16)
+    ax=fig.add_subplot(121)
+    ax.semilogx(wz, mag)    # Bode magnitude plot
+    plt.xscale('log')
+    plt.xlabel('Frequency [radians / second]')
+    plt.ylabel('Magnitude [dB]')
+    plt.margins(0, 0.1)
+    plt.grid(True)
+    #plt.axvline(wn, color='red') # cutoff frequency
+    #plt.axhline(-1*rs, color='red') # rs
+    #plt.axhline(-1*rp, color='red') # rp
+
+    ax2=fig.add_subplot(122)
+    ax2.semilogx(wz, phase)  # Bode phase plot
+    plt.xscale('log')
+    plt.xlabel('Frequency [radians / second]')
+    plt.ylabel('Phase radians')
+    plt.margins(0, 0.1)
+    plt.grid(True)
+    #plt.axvline(wn, color='red') # cutoff frequency
+    plt.show(block=False)
+    

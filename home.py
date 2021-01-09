@@ -1,12 +1,14 @@
-from sympy import oo
-import tkinter.ttk as ttk
-from threading import Thread
 import tkinter.scrolledtext as scrolledtext
-from tkthread import tk, TkThread
-from ttkthemes import ThemedStyle
-from ttkthemes import ThemedTk
-from Filter import TransferFunction,Darlington,Synthesis,PageThree
+import tkinter.ttk as ttk
+
 from tkinter import messagebox
+
+from sympy import oo
+from tkthread import  tk
+from ttkthemes import  ThemedTk
+
+from Filter import Darlington, PageThree, Synthesis, TransferFunction
+
 
 def raise_frame(frame,kind=""):
     global page
@@ -24,7 +26,7 @@ def raise_frame(frame,kind=""):
         page=TransferFunctionconf
         Refresher()                   
     frame.tkraise()
-
+    
 def takevalue(entry):
     name=entry.get()
     entry.delete(0, tk.END)
