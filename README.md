@@ -2,14 +2,14 @@
 # Schematic maker for LC,RC & RLC electronic filters
 
 ### Features
-#### Synthesis
-faster1
-faster2
-caer1
-caer2
-#### Darlington
-#### TransferFunction
-#### P(s)*P(s)
+ Synthesis
+  faster1
+  faster2
+  caer1
+  caer2
+ Darlington
+ TransferFunction
+ P(s)*P(s)
 
 for more information read this wiki https://github.com/Farzinkh/FilterProject/wiki
 
