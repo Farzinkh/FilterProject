@@ -27,10 +27,10 @@
 ![Schematic example](Schematic.png?raw=true "Schematic example")
 ### Features
 #### Synthesis
-      faster1
-      faster2
-      caer1
-      caer2
+      foster1
+      foster2
+      cauer1
+      cauer2
 #### Darlington
 #### TransferFunction
 #### P(s)*P(s)
