@@ -3,7 +3,7 @@
 ## About
 
 * Schematic maker for LC,RC & RLC electronic filters
-* Project status: working/prototype
+* Project status: prototype
 
 ## Table of contents
 
