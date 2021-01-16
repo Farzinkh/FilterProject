@@ -23,7 +23,8 @@
 ## Installation
  read this wiki https://github.com/Farzinkh/FilterProject/wiki
 ### Screenshots
-
+![Synthesis example](Synthesis.png?raw=true "Synthesis example")
+![Schematic example](Schematic.png?raw=true "Schematic example")
 ### Features
 #### Synthesis
       faster1
