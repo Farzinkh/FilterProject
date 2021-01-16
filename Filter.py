@@ -401,7 +401,7 @@ def caer2(z,gener="unkw",repeat=0,port="z11",RS=0,RL=oo):
 
 def CORE(S,M,f,port="z11",RS=0,RL=oo):
 
-    Bode(fraction(f)[0], fraction(f)[1])
+    Bode(fraction(f)[0], fraction(f)[1],port,fraction(f)[0],fraction(f)[1])
 
     if S==0:
         caer1(f,port=port,RS=RS,RL=RL)
@@ -702,8 +702,8 @@ def Hervits(z):  #study for being hervit
                 return H
             else:
                 #now we most to check monde
-                print("weak Hervits")
-                Append("weak Hervits")
+                print("Justified Hervits")
+                Append("Justified Hervits")
                 H=2
                 return H
         H=1
@@ -822,7 +822,7 @@ def Synthesis(frame,sorat,makhrag,op,real=False):
         if not pr(sorat/makhrag):
             return "synthesis is not enforceable"
 
-    Bode(sorat, makhrag)    
+    Bode(sorat, makhrag,'Z',sorat,makhrag)    
 
     if op=="f1":
         faster1(sorat/makhrag)
@@ -913,7 +913,7 @@ def sympy_to_numpy(evaluation):
     evallist=evaluation.all_coeffs() 
     return np.array(evallist,dtype=float)
 
-def Bode(Numerator, denominator):
+def Bode(Numerator, denominator,port,num,makh):
     """plot bode graph for signals
 
     Args:
@@ -925,7 +925,7 @@ def Bode(Numerator, denominator):
     wz, mag, phase =signal.bode((Numlist, denomlist),n=1000)
     plt.style.use('default')
     fig = plt.figure(figsize=(12, 6))
-    fig.suptitle('Bode graph', fontsize=16)
+    fig.suptitle('Bode graph \n'+port+"= "+"({})".format(str(num))+'/'+"({})".format(str(makh)), fontsize=16)
     ax=fig.add_subplot(121)
     ax.semilogx(wz, mag)    # Bode magnitude plot
     plt.xscale('log')
